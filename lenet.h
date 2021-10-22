@@ -1,4 +1,7 @@
 #pragma once
+/* ----- RESULTS ----- */
+#define Result ***float
+
 /* ----- CONSTANTS ----- */
 #define LENGTH_KERNEL   5
 //Features
@@ -9,7 +12,7 @@
 #define	LENGTH_FEATURE4 (LENGTH_FEATURE3 / 2)
 #define LENGTH_FEATURE5 (LENGTH_FEATURE4 - LENGTH_KERNEL + 1)
 //Layer
-#define LENGTH_CHANNEL1 6
+#define LAYERS 6
 #define INPUT           1
 #define LAYER1          6
 #define LAYER2          6
@@ -22,21 +25,21 @@
 typedef struct
 {
     //Weights
-    double weight0_1[INPUT][LAYER1][LENGTH_KERNEL][LENGTH_KERNEL];
-    double weight2_3[LAYER2][LAYER3][LENGTH_KERNEL][LENGTH_KERNEL];
-    double weight4_5[LAYER4][LAYER5][LENGTH_KERNEL][LENGTH_KERNEL];
-    double weight5_6[LAYER5 * LENGTH_FEATURE5 * LENGTH_FEATURE5][OUTPUT];
+    float weight0_1[INPUT][LAYER1][LENGTH_KERNEL][LENGTH_KERNEL];
+    float weight2_3[LAYER2][LAYER3][LENGTH_KERNEL][LENGTH_KERNEL];
+    float weight4_5[LAYER4][LAYER5][LENGTH_KERNEL][LENGTH_KERNEL];
+    float weight5_6[LAYER5 * LENGTH_FEATURE5 * LENGTH_FEATURE5][OUTPUT];
     //Bias
-    double bias0_1[LAYER1];
-    double bias2_3[LAYER3];
-    double bias4_5[LAYER5];
-    double bias5_6[OUTPUT];
+    float bias0_1[LAYER1];
+    float bias2_3[LAYER3];
+    float bias4_5[LAYER5];
+    float bias5_6[OUTPUT];
 
 }LeNet;
 
 /* ----- FUNCTIONS ----- */
-void forward(float ***data);
-void backward(float ***data);
+void forwardPropagation(float ***data);
+void backwarPropagation(float ***data);
 void training(float ***data);
 int predict(float ***data, int input);
 void initialValues(float ***data);
