@@ -1,4 +1,8 @@
 #pragma once
+
+typedef unsigned char uint8;
+typedef uint8 image[28][28];
+
 /* ----- RESULTS ----- */
 #define Result ***float
 
@@ -37,10 +41,22 @@ typedef struct
 
 }LeNet;
 
+typedef struct
+{
+    float input[INPUT][LENGTH_FEATURE0][LENGTH_FEATURE0];
+    float layer1[LAYER1][LENGTH_FEATURE1][LENGTH_FEATURE1];
+    float layer2[LAYER2][LENGTH_FEATURE2][LENGTH_FEATURE2];
+    float layer3[LAYER3][LENGTH_FEATURE3][LENGTH_FEATURE3];
+    float layer4[LAYER4][LENGTH_FEATURE4][LENGTH_FEATURE4];
+    float layer5[LAYER5][LENGTH_FEATURE5][LENGTH_FEATURE5];
+    float output[OUTPUT];
+}Feature;
+
 /* ----- FUNCTIONS ----- */
-void forwardPropagation(float ***data);
-void backwarPropagation(float ***data);
+void forwardPropagation(LeNet *lenet, Feature *features);
+void backwardPropagation(float ***data);
 void training(float ***data);
-int predict(float ***data, int input);
+uint8 predict(LeNet *lenet, image input, uint8 count);
+
 void initialValues(float ***data);
 
