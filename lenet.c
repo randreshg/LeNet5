@@ -8,7 +8,7 @@ void forwardPropagation(LeNet *lenet, Feature *features){
     convolution(features->layer2, lenet->weight2_3, lenet->bias2_3, features->layer3);
     subsampling(features->layer3, features->layer4);
     convolution(features->layer4, lenet->weight4_5, lenet->bias4_5, features->layer5);
-    dotproduct(features->layer5, features->output, lenet->weight5_6, lenet->bias5_6);
+    dotproduct(features->layer5, lenet->weight5_6, lenet->bias5_6, features->output);
 }
 
 uint8 predict(LeNet *lenet, image input, uint8 count)

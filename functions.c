@@ -51,15 +51,15 @@ void subsampling(float ***input, float ***output){
             }
 }
 
-void dotproduct(float ***input, float **weight, float *bias, float ***output){
+void dotproduct(float ***input, float **weight, float *bias, float *output){
     int wx, wy;
     int wx_size = GET_LENGTH(weight), wy_size = GET_LENGTH(*weight);
     //Convolution
     for(wx = 0; wx < wx_size; wx++)
         for(wy = 0; wy < wy_size; wy++)
-            ((float *)output)[wy] += ((float *)input)[wx] * weight[wx][wy];
+            *(output + wy) += ((float *)input)[wx] * (*(*(weight + wx) + wy));
     //Activation function + bias
     int ox_size = GET_LENGTH(bias);
     for(wx = 0; wx < ox_size; wx++)
-        ((float *)output)[wx] = ReLU(((float *)output)[wx] + bias[wx]);
+        *(output + wx) = ReLU(*(output + wx) + *(bias + wx));
 }
