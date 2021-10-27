@@ -6,7 +6,8 @@
 
 void forwardPropagation(LeNet *lenet, Feature *features){
     printf("Convolution 1 \n");
-    convolution((double ***)features->input, (double ****)lenet->weight0_1, lenet->bias0_1, (double ***)features->layer1);
+    //Layer 1
+    convolution(features, *lenet);
     printf("Subsampling 1 \n");
     subsampling((double ***)features->layer1, (double ***)features->layer2);
     printf("Convolution 2 \n");
@@ -18,7 +19,9 @@ void forwardPropagation(LeNet *lenet, Feature *features){
 
 static inline void load_input(Feature *features, image input)
 {
-    double (*layer0)[LENGTH_FEATURE0][LENGTH_FEATURE0] = features->input;
+    MALLOC_FEATURE(features);
+
+    double *layer0[LENGTH_FEATURE0][LENGTH_FEATURE0] = features[0].pointer;
     const long sz = sizeof(image) / sizeof(**input);
     double mean = 0, std = 0;
 
@@ -39,7 +42,16 @@ static inline void load_input(Feature *features, image input)
 
 uint8 predict(LeNet *lenet, image input, uint8 count)
 {
-    Feature features = { 0 };
+    Feature features[ ] = {
+        {NULL, INPUT, LENGTH_FEATURE0, LENGTH_FEATURE0*LENGTH_FEATURE0},
+        {NULL, LAYER1, LENGTH_FEATURE1, LENGTH_FEATURE1*LENGTH_FEATURE1},
+        {NULL, LAYER2, LENGTH_FEATURE2, LENGTH_FEATURE2*LENGTH_FEATURE2},
+        {NULL, LAYER3, LENGTH_FEATURE3, LENGTH_FEATURE3*LENGTH_FEATURE3},
+        {NULL, LAYER4, LENGTH_FEATURE4, LENGTH_FEATURE4*LENGTH_FEATURE4},
+        {NULL, LAYER5, LENGTH_FEATURE5, LENGTH_FEATURE5*LENGTH_FEATURE5},
+        {NULL, OUTPUT, 0, 0}
+    };
+
     load_input(&features, input);
     
     forwardPropagation(lenet, &features);

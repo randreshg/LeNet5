@@ -23,30 +23,44 @@ typedef uint8 image[28][28];
 #define OUTPUT          10
 
 /* ----- DATA STRUCTURE ----- */
+// typedef struct
+// {
+//     //Weights
+//     double weight0_1[INPUT][LAYER1][LENGTH_KERNEL][LENGTH_KERNEL];
+//     double weight2_3[LAYER2][LAYER3][LENGTH_KERNEL][LENGTH_KERNEL];
+//     double weight4_5[LAYER4][LAYER5][LENGTH_KERNEL][LENGTH_KERNEL];
+//     double weight5_6[LAYER5 * LENGTH_FEATURE5 * LENGTH_FEATURE5][OUTPUT];
+//     //Bias
+//     double bias0_1[LAYER1];
+//     double bias2_3[LAYER3];
+//     double bias4_5[LAYER5];
+//     double bias5_6[OUTPUT];
+
+// }LeNet;
+// typedef struct
+// {
+//     double input[INPUT][LENGTH_FEATURE0][LENGTH_FEATURE0];
+//     double layer1[LAYER1][LENGTH_FEATURE1][LENGTH_FEATURE1];
+//     double layer2[LAYER2][LENGTH_FEATURE2][LENGTH_FEATURE2];
+//     double layer3[LAYER3][LENGTH_FEATURE3][LENGTH_FEATURE3];
+//     double layer4[LAYER4][LENGTH_FEATURE4][LENGTH_FEATURE4];
+//     double layer5[LAYER5][LENGTH_FEATURE5][LENGTH_FEATURE5];
+//     double output[OUTPUT];
+// }Feature;
+
 typedef struct
 {
-    //Weights
-    double weight0_1[INPUT][LAYER1][LENGTH_KERNEL][LENGTH_KERNEL];
-    double weight2_3[LAYER2][LAYER3][LENGTH_KERNEL][LENGTH_KERNEL];
-    double weight4_5[LAYER4][LAYER5][LENGTH_KERNEL][LENGTH_KERNEL];
-    double weight5_6[LAYER5 * LENGTH_FEATURE5 * LENGTH_FEATURE5][OUTPUT];
-    //Bias
-    double bias0_1[LAYER1];
-    double bias2_3[LAYER3];
-    double bias4_5[LAYER5];
-    double bias5_6[OUTPUT];
-
-}LeNet;
+    float *weight;
+    float *bias;
+    const uint8 length_input, length_output;
+} LeNet;
 
 typedef struct
 {
-    double input[INPUT][LENGTH_FEATURE0][LENGTH_FEATURE0];
-    double layer1[LAYER1][LENGTH_FEATURE1][LENGTH_FEATURE1];
-    double layer2[LAYER2][LENGTH_FEATURE2][LENGTH_FEATURE2];
-    double layer3[LAYER3][LENGTH_FEATURE3][LENGTH_FEATURE3];
-    double layer4[LAYER4][LENGTH_FEATURE4][LENGTH_FEATURE4];
-    double layer5[LAYER5][LENGTH_FEATURE5][LENGTH_FEATURE5];
-    double output[OUTPUT];
+    float *pointer;
+    const uint8 length_filter;
+    const uint8 length_feature;
+    const unsigned int size_matrix;
 }Feature;
 
 /* ----- FUNCTIONS ----- */

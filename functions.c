@@ -5,35 +5,37 @@
 /* ----- FUNCTIONS ----- */
 #define ReLU(x) (x>0? x: 0)
 
-void convolute(double **input, double **weight, double **output ){
+void convolute(double *input, double *weight, double **output ){
+    //Aux variables
     const int ox_size = GET_LENGTH(output), oy_size = GET_LENGTH(*output);
-    const int wx_size = GET_LENGTH(weight), wy_size = GET_LENGTH(*weight);
+    //const int wx_size = GET_LENGTH(weight), wy_size = GET_LENGTH(*weight);
     int ox, oy, wx, wy;
     //Output loop
     for(ox = 0; ox < ox_size; ox++)
     for(oy = 0; oy < oy_size; oy++)
         //Weight matrix loop
-        for(wx = 0; wx < wx_size; wx++)
-        for(wy = 0; wy < wy_size; wy++)
+        for(wx = 0; wx < LENGTH_KERNEL; wx++)
+        for(wy = 0; wy < LENGTH_KERNEL; wy++)
             //Cross-Correlation
             *(*(output+ox)+oy) += (*(*(input+ox+wx)+oy+wy)) * (*(*(weight+wx)+wy));
 }
 
-void convolution(double ***input, double ****weight, double *bias, double ***output){
-    const int wx_size = GET_LENGTH(weight), wy_size = GET_LENGTH(*weight);
-    int wx, wy;
+void convolution(Feature *input, LeNet lenet){
+    Feature *output = input + 1;
+    MALLOC_FEATURE(output);
+    //Aux variables
+    const uint8 wx_size = lenet.length_input, wy_size = lenet.length_output;
+    uint8 wx, wy;
     //Convolution
-    printf("----%p \n", (input+wx));
-    printf("----%p \n", input[wx]);
-    printf("----%d \n", *((double *)input+wx));
     for(wx = 0; wx < wx_size; wx++)
     for(wy = 0; wy < wy_size; wy++)
-        convolute(*(input+wx), *(*(weight+wx)+wy), *(output+wy));
+        convolute(input+(wx*input->size_matrix), *(*(weight+wx)+wy), output+(wy*output->size_matrix));
     //Activation function + bias
     int ox_size = GET_LENGTH(output), oy_size = GET_LENGTH(*output);
     for(wx = 0; wx < ox_size; wx++)
     for(wy = 0; wy < oy_size; wy++)
         *(**(output+wx)+wy) = ReLU(*(**(output+wx)+wy) + *(bias+wx));
+    //Free memory
 }
 
 void subsampling(double ***input, double ***output){
