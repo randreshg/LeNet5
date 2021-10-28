@@ -68,13 +68,18 @@ void subsampling(Feature *input){
 
 
 void dotproduct(Feature *input, LeNet lenet){
-    input->
-    int wn, wm;
-    const int wn_size = GET_LENGTH(weight), wm_size = GET_LENGTH(*weight);
-    //Convolution
-    for(wn = 0; wn < wn_size; wn++)
-        for(wm = 0; wm < wm_size; wm++)
-            *(output + wm) += ((double *)input)[wn] * (*(*(weight + wn) + wm));
+    //Output malloc
+    Feature *output = input + 1;
+    FEATURE_MALLOCMATRIX(output);
+    //Aux variables
+    uint wn1, wn2, wm;
+    Matrix *weightMatrix = WEIGHT_GETMATRIX(lenet.weight, 0, 0);
+    Matrix *outputMatrix = FEATURE_GETMATRIX(output, 0);
+    //Dot product
+    for(wn1 = 0; wn1 < weightMatrix->n; wn1++)
+    for(wm = 0; wm < weightMatrix->m; wm++)
+        MATRIX_VALUE(outputMatrix, 0, wm) += 
+            *(output + wm) += (double *)input)[wn] * MATRIX_VALUE(weightMatrix, wn, wm);
     //Activation function + bias
     const int on_size = GET_LENGTH(bias);
     for(wn = 0; wn < on_size; wn++)
