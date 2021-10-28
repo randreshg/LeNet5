@@ -4,15 +4,18 @@
 /* ----- FEATURE ----- */
 typedef struct Feature
 {
-    uint8 n;
-    Matrix *p;
+    uint n;
+    Matrix *matrix;
 } Feature;
 
-#define FEATURE_MATRIX(w) w->p = malloc(sizeof(Matrix)*(w->n)*(w->m))
+#define FEATURE_GETMATRIX(f, na) (f->matrix + na)
+#define FEATURE_MALLOCMATRIX(f) f->matrix = malloc(sizeof(Matrix)*(f->n))
+#define FEATURE_FREEMATRIX(w) free(w->matrix)
+
 
 Feature *FEATURE(uint8 n, uint8 fl)
 {
     Feature *fe = (Feature *)malloc(sizeof(Feature));
-    fe->n = n, fe->p = NULL;
+    fe->n = n, fe->matrix = NULL;
     return fe;
 }

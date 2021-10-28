@@ -51,7 +51,7 @@
 typedef struct
 {
     Weight *weight;
-    number *bias;
+    Array *bias;
 } LeNet;
 
 

@@ -4,10 +4,11 @@
 /* ----- MATRIX ----- */
 typedef struct Matrix
 {
-    uint8 n, m;
+    uint n, m;
     number *p;
 } Matrix;
 
+#define MATRIX_VALUE(ma, ni, mi) *(ma->p + ni*ma->m + mi)
 
 Matrix *MATRIX(uint8 n, uint8 m)
 {

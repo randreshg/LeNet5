@@ -4,10 +4,11 @@
 /* ----- ARRAY ----- */
 typedef struct Array
 {
-    uint8 n;
+    uint n;
     number *p;
 } Array;
 
+#define ARRAY_VALUE(ar, n) *(ar->p+n)
 
 Array *ARRAY(uint n)
 {
