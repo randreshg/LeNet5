@@ -1,8 +1,5 @@
 #pragma once
 
-typedef unsigned char uint8;
-typedef uint8 image[28][28];
-
 /* ----- CONSTANTS ----- */
 #define LENGTH_KERNEL   5
 //Features
@@ -22,7 +19,7 @@ typedef uint8 image[28][28];
 #define LAYER5          120
 #define OUTPUT          10
 
-/* ----- DATA STRUCTURE ----- */
+
 // typedef struct
 // {
 //     //Weights
@@ -47,21 +44,79 @@ typedef uint8 image[28][28];
 //     double layer5[LAYER5][LENGTH_FEATURE5][LENGTH_FEATURE5];
 //     double output[OUTPUT];
 // }Feature;
+/* ----- DATA TYPES ----- */
+typedef unsigned char uint8;
+typedef uint8 image[28][28];
+typedef float number;
 
+/* ----- DATA STRUCTURES ----- */
 typedef struct
 {
-    float *weight;
-    float *bias;
-    const uint8 length_input, length_output;
+    Weight *weight;
+    number *bias;
 } LeNet;
 
 typedef struct
 {
-    float *pointer;
-    const uint8 length_filter;
-    const uint8 length_feature;
-    const unsigned int size_matrix;
-}Feature;
+    uint8 n;
+    number *p;
+} Array;
+
+typedef struct
+{
+    uint8 n, m;
+    number *p;
+} Matrix;
+
+typedef struct
+{
+    uint8 n;
+    Matrix *p;
+} Feature;
+
+typedef struct
+{
+    uint8 n, m;
+    Matrix *p;
+} Weight;
+
+
+/* ----- CONSTRUCTORS ----- */
+Array *ARRAY(uint n)
+{
+    Array *ar = (Array *)malloc(sizeof(Array));
+    ar->n = n, ar->p = malloc(sizeof(number)*(n));
+    return ar;
+}
+
+Matrix *MATRIX(uint n, uint m)
+{
+    Matrix *ma = (Matrix *)malloc(sizeof(Matrix));
+    ma->n = n, ma->m = m;
+    ma->p = malloc(sizeof(number)*(n)*(m));
+    return ma;
+}
+
+Feature *FEATURE(uint n, uint fl)
+{
+    Feature *fe = (Feature *)malloc(sizeof(Feature));
+    fe->n = n, fe->p = MATRIX(fl, fl);
+    return fe;
+}
+
+Weight *WEIGHT(uint n, uint m)
+{
+    Weight *we = (Weight *)malloc(sizeof(Weight));
+    we->n = n, we->m = m;
+    we->p = malloc(sizeof(Matrix)*(n)*(m));
+    return we;
+}
+
+LeNet *LENET(uint n, uint m){
+    LeNet *le = (LeNet *)malloc(sizeof(LeNet));
+    le->weight = WEIGHT(n, m);
+    le->bias = ARRAY(m);
+}
 
 /* ----- FUNCTIONS ----- */
 void forwardPropagation(LeNet *lenet, Feature *features);
