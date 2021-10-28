@@ -8,33 +8,32 @@
 void convolute(double *input, double *weight, double **output ){
     //Aux variables
     const int ox_size = GET_LENGTH(output), oy_size = GET_LENGTH(*output);
-    //const int wx_size = GET_LENGTH(weight), wy_size = GET_LENGTH(*weight);
-    int ox, oy, wx, wy;
+    //const int wn_size = GET_LENGTH(weight), wm_size = GET_LENGTH(*weight);
+    int ox, oy, wn, wm;
     //Output loop
     for(ox = 0; ox < ox_size; ox++)
     for(oy = 0; oy < oy_size; oy++)
         //Weight matrix loop
-        for(wx = 0; wx < LENGTH_KERNEL; wx++)
-        for(wy = 0; wy < LENGTH_KERNEL; wy++)
+        for(wn = 0; wn < LENGTH_KERNEL; wn++)
+        for(wm = 0; wm < LENGTH_KERNEL; wm++)
             //Cross-Correlation
-            *(*(output+ox)+oy) += (*(*(input+ox+wx)+oy+wy)) * (*(*(weight+wx)+wy));
+            *(*(output+ox)+oy) += (*(*(input+ox+wn)+oy+wm)) * (*(*(weight+wn)+wm));
 }
 
 void convolution(Feature *input, LeNet lenet){
     Feature *output = input + 1;
     MALLOC_FEATURE(output);
     //Aux variables
-    const uint8 wx_size = lenet.length_input, wy_size = lenet.length_output;
-    uint8 wx, wy;
+    uint8 wn, wm;
     //Convolution
-    for(wx = 0; wx < wx_size; wx++)
-    for(wy = 0; wy < wy_size; wy++)
-        convolute(input+(wx*input->size_matrix), *(*(weight+wx)+wy), output+(wy*output->size_matrix));
+    for(wn = 0; wn < lenet.weight->n; wn++)
+    for(wm = 0; wm < lenet.weight->m; wm++)
+        convolute(input+wn, *(*(weight+wn)+wm), output+wm);
     //Activation function + bias
-    int ox_size = GET_LENGTH(output), oy_size = GET_LENGTH(*output);
-    for(wx = 0; wx < ox_size; wx++)
-    for(wy = 0; wy < oy_size; wy++)
-        *(**(output+wx)+wy) = ReLU(*(**(output+wx)+wy) + *(bias+wx));
+    // int ox_size = GET_LENGTH(output), oy_size = GET_LENGTH(*output);
+    // for(wn = 0; wn < ox_size; wn++)
+    // for(wm = 0; wm < oy_size; wm++)
+    //     *(**(output+wn)+wm) = ReLU(*(**(output+wn)+wm) + *(bias+wn));
     //Free memory
 }
 
@@ -57,14 +56,14 @@ void subsampling(double ***input, double ***output){
 }
 
 void dotproduct(double ***input, double **weight, double *bias, double *output){
-    int wx, wy;
-    const int wx_size = GET_LENGTH(weight), wy_size = GET_LENGTH(*weight);
+    int wn, wm;
+    const int wn_size = GET_LENGTH(weight), wm_size = GET_LENGTH(*weight);
     //Convolution
-    for(wx = 0; wx < wx_size; wx++)
-        for(wy = 0; wy < wy_size; wy++)
-            *(output + wy) += ((double *)input)[wx] * (*(*(weight + wx) + wy));
+    for(wn = 0; wn < wn_size; wn++)
+        for(wm = 0; wm < wm_size; wm++)
+            *(output + wm) += ((double *)input)[wn] * (*(*(weight + wn) + wm));
     //Activation function + bias
     const int ox_size = GET_LENGTH(bias);
-    for(wx = 0; wx < ox_size; wx++)
-        *(output + wx) = ReLU(*(output + wx) + *(bias + wx));
+    for(wn = 0; wn < ox_size; wn++)
+        *(output + wn) = ReLU(*(output + wn) + *(bias + wn));
 }
