@@ -45,7 +45,7 @@ void subsampling(Feature *input){
     //Aux variables
     Matrix *mo;
     unsigned int o, on, om, ln, lm, max, aux_n, aux_m, aux;
-    const uint ln_size = (input->matrix->n)/(output->matrix->n), lm_size = (input->matrix->m)/(output->matrix->m);
+    const uint ln_length = (input->matrix->n)/(output->matrix->n), lm_length = (input->matrix->m)/(output->matrix->m);
     //Ouput array loop
     for(o = 0; o < output->n; o++){
         mo = FEATURE_GETMATRIX(output, o);
@@ -53,9 +53,9 @@ void subsampling(Feature *input){
         for(on = 0; on < mo->n; on++)
         for(om = 0; om < mo->m; om++){
             //Subsampling
-            max = 0, aux_n = ln_size*on, aux_m = lm_size*om;
-            for(ln = 0; ln < ln_size; ln++)
-                for(lm = 0; lm < lm_size; lm++){
+            max = 0, aux_n = ln_length*on, aux_m = lm_length*om;
+            for(ln = 0; ln < ln_length; ln++)
+                for(lm = 0; lm < lm_length; lm++){
                     aux = MATRIX_VALUE(FEATURE_GETMATRIX(input, o), (aux_n + ln), (aux_m + lm));
                     max = aux > max ? aux:max;
                 }
@@ -75,13 +75,19 @@ void dotproduct(Feature *input, LeNet lenet){
     uint wn1, wn2, wm;
     Matrix *weightMatrix = WEIGHT_GETMATRIX(lenet.weight, 0, 0);
     Matrix *outputMatrix = FEATURE_GETMATRIX(output, 0);
+
+    const uint wn1_length = input->n, wn2_length = (weightMatrix->n)/wn1_length;
+
+
+    
     //Dot product
-    for(wn1 = 0; wn1 < weightMatrix->n; wn1++)
+    for(wn1 = 0; wn1 < wn1_length; wn1++)
+    for(wn2 = 0; wn2 < wn2_length; wn2++)
     for(wm = 0; wm < weightMatrix->m; wm++)
-        MATRIX_VALUE(outputMatrix, 0, wm) += 
-            *(output + wm) += (double *)input)[wn] * MATRIX_VALUE(weightMatrix, wn, wm);
+        MATRIX_VALUE(outputMatrix, 0, wm) += MATRIX_VALUE(FEATURE_GETMATRIX(input, wn1), wn1, wn2) * MATRIX_VALUE(weightMatrix, (wn1+wn2), wm);
+    
     //Activation function + bias
-    const int on_size = GET_LENGTH(bias);
-    for(wn = 0; wn < on_size; wn++)
+    const int on_length = GET_LENGTH(bias);
+    for(wn = 0; wn < on_length; wn++)
         *(output + wn) = ReLU(*(output + wn) + *(bias + wn));
 }
