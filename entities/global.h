@@ -1,6 +1,4 @@
 #pragma once
-#include <stdlib.h>
-
 
 /* ----- DATA TYPES ----- */
 typedef unsigned char uint8;
@@ -13,6 +11,12 @@ struct Matrix;
 struct Weight;
 struct Array;
 
+/* ----- DEPENDENCIES ----- */
+#include <stdlib.h>
+#include <stdio.h>
+#include <math.h>
+
+/* ----- OTHER ----- */
 #include "Array.h"
 #include "Weight.h"
 #include "Feature.h"

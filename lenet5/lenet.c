@@ -1,8 +1,5 @@
 #include "lenet.h"
-#include "functions.h"
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
+
 
 void forwardPropagation(LeNet *lenet, Feature *features){
     printf("Convolution 1 \n");

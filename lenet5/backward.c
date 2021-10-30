@@ -1,11 +1,7 @@
-#include "functions.h"
 #include "lenet.h"
-#include <stdlib.h>
 
-/* ----- FUNCTIONS ----- */
-#define ReLU(x) (x>0? x: 0)
-
-void convolute(Matrix *input, Matrix *weight, Array *bias , Matrix *output ){
+/* ----- BACKWARD FUNCTIONS ----- */
+void convolute_backward(Matrix *input, Matrix *weight, Array *bias , Matrix *output ){
     //Aux variables
     uint on, om, wn, wm;
     //Output loop
@@ -22,7 +18,7 @@ void convolute(Matrix *input, Matrix *weight, Array *bias , Matrix *output ){
     }
 }
 
-void convolution(Feature *input, LeNet lenet){
+void convolution_backward(Feature *input, LeNet lenet){
     //Output malloc
     Feature *output = input + 1;
     FEATURE_MALLOCMATRIX(output);
@@ -38,7 +34,7 @@ void convolution(Feature *input, LeNet lenet){
 
 }
 
-void subsampling(Feature *input){
+void subsampling_backward(Feature *input){
     //Output malloc
     Feature *output = input + 1;
     FEATURE_MALLOCMATRIX(output);
@@ -66,8 +62,7 @@ void subsampling(Feature *input){
     FEATURE_FREEMATRIX(input);
 }
 
-
-void dotproduct(Feature *input, LeNet lenet){
+void dotproduct_backward(Feature *input, LeNet lenet){
     //Output malloc
     Feature *output = input + 1;
     FEATURE_MALLOCMATRIX(output);
@@ -75,19 +70,15 @@ void dotproduct(Feature *input, LeNet lenet){
     uint wn1, wn2, wm;
     Matrix *weightMatrix = WEIGHT_GETMATRIX(lenet.weight, 0, 0);
     Matrix *outputMatrix = FEATURE_GETMATRIX(output, 0);
-
     const uint wn1_length = input->n, wn2_length = (weightMatrix->n)/wn1_length;
-
-
-    
     //Dot product
     for(wn1 = 0; wn1 < wn1_length; wn1++)
     for(wn2 = 0; wn2 < wn2_length; wn2++)
     for(wm = 0; wm < weightMatrix->m; wm++)
-        MATRIX_VALUE(outputMatrix, 0, wm) += MATRIX_VALUE(FEATURE_GETMATRIX(input, wn1), wn1, wn2) * MATRIX_VALUE(weightMatrix, (wn1+wn2), wm);
-    
+        MATRIX_VALUE(outputMatrix, 0, wm) += *(FEATURE_GETMATRIX(input, wn1)->p + wn2) * MATRIX_VALUE(weightMatrix, (wn1+wn2), wm);
     //Activation function + bias
-    const int on_length = GET_LENGTH(bias);
-    for(wn = 0; wn < on_length; wn++)
-        *(output + wn) = ReLU(*(output + wn) + *(bias + wn));
+    for(wm = 0; wm < outputMatrix->m; wm++)
+        MATRIX_VALUE(outputMatrix, 0, wm) = ReLU(MATRIX_VALUE(outputMatrix, 0, wm) + ARRAY_VALUE(lenet.bias, wm));
+    //Free memory
+    FEATURE_FREEMATRIX(input);
 }
