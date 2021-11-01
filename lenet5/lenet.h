@@ -35,8 +35,10 @@ LeNet *LENET(uint n, uint m){
 }
 
 /* ----- FUNCTIONS ----- */
-#define ReLU(x) (x>0? x: 0)
-#define ReLU_GRAD(x) (x>0)
+void forwardPropagation(LeNet *lenet, Feature *features);
+void backwardPropagation(LeNet *lenet, Feature *features);
+
+
 void initialValues(double ***data);
 void initial(LeNet *lenet);
 void training(double ***data);
@@ -55,3 +57,9 @@ void convolute_forward(Matrix *input, Matrix *weight, Array *bias , Matrix *outp
 void convolution_forward(Feature *input, LeNet lenet);
 void subsampling_forward(Feature *input);
 void dotproduct_forward(Feature *input, LeNet lenet);
+
+/* ----- OTHERS ----- */
+#define ReLU(x) (x>0? x: 0)
+#define ReLU_GRAD(x) (x>0)
+void softMax(Feature *input);
+void costFunction(Matrix *input);
