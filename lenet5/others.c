@@ -15,10 +15,15 @@ void softMax(Feature *input){
     for(om = 0; om < inputMatrix->m; om++)
         ARRAY_VALUE(output, om) = MATRIX_VALUE(inputMatrix, 0, om)/den;
     //Softmax gradient
-
-
 }
 
-// void costFunction(Feature *input, Array *target){
-//     uint m = target->n;
-// }
+number costFunction(Feature *input, Array *target){
+    //Aux variables
+    uint om;
+    number cost = 0;
+    Matrix *inputMatrix = FEATURE_GETMATRIX(input, 0);
+    for(om =0; om<inputMatrix->m; om++){
+        cost = ARRAY_VALUE(target, om)*log(MATRIX_VALUE(inputMatrix, 0, om));
+    }
+    return (-cost/inputMatrix->m);
+}
