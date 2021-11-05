@@ -9,8 +9,10 @@ void softMax(Feature *input){
     number den = 0.0;
     Matrix *inputMatrix = FEATURE_GETMATRIX(input, 0);
     //Get denominator
-    for(om = 0; om < inputMatrix->m; om++)
+    for(om = 0; om < inputMatrix->m; om++){
+        MATRIX_VALUE(inputMatrix, 0, om) = exp(MATRIX_VALUE(inputMatrix, 0, om));
         den += MATRIX_VALUE(inputMatrix, 0, om);
+    }
     //Softmax calculation
     for(om = 0; om < inputMatrix->m; om++)
         ARRAY_VALUE(output, om) = MATRIX_VALUE(inputMatrix, 0, om)/den;
