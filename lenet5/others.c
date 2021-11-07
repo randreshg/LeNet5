@@ -30,3 +30,5 @@ number costFunction(Feature *input, Array *target){
     }
     return (-cost/inputMatrix->m);
 }
+
+

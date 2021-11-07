@@ -13,7 +13,7 @@ void convolute_backward(Matrix *input, Matrix *weight, Array *bias , Matrix *out
         for(wn = 0; wn < weight->n; wn++)
         for(wm = 0; wm < weight->m; wm++)
             //Cross-Correlation
-            MATRIX_VALUE(output, on, om) += MATRIX_VALUE(input, (on+wn), (om+wm)) * MATRIX_VALUE(weight, wn, wm);
+            MATRIX_VALUE(output, (on+wn), (om+wm)) += MATRIX_VALUE(input, on, om) * MATRIX_VALUE(weight, wn, wm);
         //Activation function + bias
         MATRIX_VALUE(output, on, om) = ReLU(MATRIX_VALUE(output, on, om) + ARRAY_VALUE(bias, om));
     }
@@ -30,6 +30,8 @@ void convolution_backward(Feature *input, Feature *featureGradient, LeNet *lenet
     for(wm = 0; wm < lenet.weight->m; wm++)
         convolute(FEATURE_GETMATRIX(input, wn), WEIGHT_GETMATRIX(lenet.weight, wn, wm), 
                   lenet.bias, FEATURE_GETMATRIX(output, wm));
+    //Activation function
+
     //Free memory
     FEATURE_FREEMATRIX(input);
 
@@ -38,7 +40,6 @@ void convolution_backward(Feature *input, Feature *featureGradient, LeNet *lenet
 void subsampling_backward(Feature *input){
     //Output malloc
     Feature *output = input + 1;
-    FEATURE_MALLOCMATRIX(output);
     //Aux variables
     Matrix *mo;
     unsigned int o, on, om, ln, lm, max, aux_n, aux_m, aux;
@@ -59,8 +60,6 @@ void subsampling_backward(Feature *input){
             MATRIX_VALUE(mo, on, om) = max;
         }
     }
-    //Free memory
-    FEATURE_FREEMATRIX(input);
 }
 
 void dotproduct_backward(Feature *input, LeNet lenet, Feature *inputGradient, LeNet gradientLenet){

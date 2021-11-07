@@ -53,10 +53,10 @@ void subsampling_forward(Feature *input);
 void dotproduct_forward(Feature *input, LeNet lenet);
 
 /* ----- BACKWARD ----- */
-void convolute_forward(Matrix *input, Matrix *weight, Array *bias , Matrix *output );
-void convolution_forward(Feature *input, LeNet lenet);
-void subsampling_forward(Feature *input);
-void dotproduct_forward(Feature *input, LeNet lenet);
+void convolute_backward(Matrix *input, Matrix *weight, Array *bias , Matrix *output );
+void convolution_backward(Feature *input, LeNet lenet);
+void subsampling_backward(Feature *input);
+void dotproduct_backward(Feature *input, LeNet lenet);
 
 /* ----- OTHERS ----- */
 #define ReLU(x) (x>0? x: 0)
