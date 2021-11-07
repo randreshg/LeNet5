@@ -21,7 +21,7 @@ void convolute_forward(Matrix *input, Matrix *weight, Array *bias , Matrix *outp
 void convolution_forward(Feature *input, LeNet lenet){
     //Output malloc
     Feature *output = input + 1;
-    FEATURE_MALLOCMATRIX(output);
+    //FEATURE_MALLOCMATRIX(output);
     //Aux variables
     uint wn, wm;
     //Convolution
@@ -37,7 +37,7 @@ void convolution_forward(Feature *input, LeNet lenet){
 void subsampling_forward(Feature *input){
     //Output malloc
     Feature *output = input + 1;
-    FEATURE_MALLOCMATRIX(output);
+    //FEATURE_MALLOCMATRIX(output);
     //Aux variables
     Matrix *mo;
     unsigned int o, on, om, ln, lm, max, aux_n, aux_m, aux;
@@ -65,7 +65,7 @@ void subsampling_forward(Feature *input){
 void dotproduct_forward(Feature *input, LeNet lenet){
     //Output malloc
     Feature *output = input + 1;
-    FEATURE_MALLOCMATRIX(output);
+    //FEATURE_MALLOCMATRIX(output);
     //Aux variables
     uint wn1, wn2, wm;
     Matrix *weightMatrix = WEIGHT_GETMATRIX(lenet.weight, 0, 0);

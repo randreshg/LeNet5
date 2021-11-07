@@ -61,5 +61,5 @@ void dotproduct_forward(Feature *input, LeNet lenet);
 /* ----- OTHERS ----- */
 #define ReLU(x) (x>0? x: 0)
 #define ReLU_GRAD(x) (x>0)
-void softMax(Feature *input);
-number costFunction(Feature *input, Array *target)
+void  softMax(Feature *input, Array *target, Feature *gradient);
+number costFunction(Feature *input, Array *target);
