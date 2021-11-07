@@ -1,6 +1,7 @@
 #include "lenet.h"
 
 /* ----- BACKWARD FUNCTIONS ----- */
+
 void convolute_backward(Matrix *input, Matrix *weight, Array *bias , Matrix *output ){
     //Aux variables
     uint on, om, wn, wm;
@@ -18,7 +19,7 @@ void convolute_backward(Matrix *input, Matrix *weight, Array *bias , Matrix *out
     }
 }
 
-void convolution_backward(Feature *input, LeNet lenet){
+void convolution_backward(Feature *input, Feature *featureGradient, LeNet *lenetGradient){
     //Output malloc
     Feature *output = input + 1;
     FEATURE_MALLOCMATRIX(output);
@@ -62,23 +63,37 @@ void subsampling_backward(Feature *input){
     FEATURE_FREEMATRIX(input);
 }
 
-void dotproduct_backward(Feature *input, LeNet lenet){
+void dotproduct_backward(Feature *input, LeNet lenet, Feature *inputGradient, LeNet gradientLenet){
     //Output malloc
-    Feature *output = input + 1;
-    FEATURE_MALLOCMATRIX(output);
+    Feature *outputGradient = inputGradient - 1;
     //Aux variables
-    uint wn1, wn2, wm;
+    uint wn1, wn2, wm, wn1_aux;
     Matrix *weightMatrix = WEIGHT_GETMATRIX(lenet.weight, 0, 0);
-    Matrix *outputMatrix = FEATURE_GETMATRIX(output, 0);
-    const uint wn1_length = input->n, wn2_length = (weightMatrix->n)/wn1_length;
-    //Dot product
-    for(wn1 = 0; wn1 < wn1_length; wn1++)
-    for(wn2 = 0; wn2 < wn2_length; wn2++)
-    for(wm = 0; wm < weightMatrix->m; wm++)
-        MATRIX_VALUE(outputMatrix, 0, wm) += *(FEATURE_GETMATRIX(input, wn1)->p + wn2) * MATRIX_VALUE(weightMatrix, (wn1+wn2), wm);
-    //Activation function + bias
-    for(wm = 0; wm < outputMatrix->m; wm++)
-        MATRIX_VALUE(outputMatrix, 0, wm) = ReLU(MATRIX_VALUE(outputMatrix, 0, wm) + ARRAY_VALUE(lenet.bias, wm));
-    //Free memory
-    FEATURE_FREEMATRIX(input);
+    Matrix *weightGradientMatrix = WEIGHT_GETMATRIX(gradientLenet.weight, 0, 0);
+    Matrix *inputGradientMatrix = FEATURE_GETMATRIX(inputGradient, 0);
+    const uint wn1_length = outputGradient->n, wn2_length = (weightMatrix->n)/wn1_length;
+    
+    for(wn1 = 0; wn1 < wn1_length; wn1++){
+        wn1_aux = wn1*wn2_length;
+        for(wn2 = 0; wn2 < wn2_length; wn2++){
+            //Dot product
+            for(wm = 0; wm < weightMatrix->m; wm++)
+                *(FEATURE_GETMATRIX(outputGradient, wn1)->p + wn2) += MATRIX_VALUE(inputGradientMatrix, 0, wm) * MATRIX_VALUE(weightMatrix, (wn1_aux+wn2), wm);
+            //Activation function + bias
+            *(FEATURE_GETMATRIX(outputGradient, wn1)->p + wn2) *= ReLU_GRAD(FEATURE_GETMATRIX(input, wn1)->p + wn2);
+        }
+    }
+    //Update bias
+    for(wm = 0; wm < gradientLenet.bias->n; wm++)
+        ARRAY_VALUE(gradientLenet.bias, wm) += MATRIX_VALUE(inputGradientMatrix, 0, wm);
+    //Uptate weights
+    for(wn1 = 0; wn1 < wn1_length; wn1++){
+        wn1_aux = wn1*wn2_length;
+        for(wn2 = 0; wn2 < wn2_length; wn2++){
+            //Dot product
+            for(wm = 0; wm < weightMatrix->m; wm++)
+                MATRIX_VALUE(weightGradientMatrix, (wn1_aux+wn2), wm) += *(FEATURE_GETMATRIX(input, wn1)->p + wn2)*MATRIX_VALUE(inputGradientMatrix, 0, wm);
+        }
+    }
+    
 }
