@@ -55,25 +55,27 @@ void convolution_backward(Feature *input, LeNet lenet, Feature *inputGradient, L
 void subsampling_backward(Feature *input, Feature *inputGradient){
     Feature *outputGradient = inputGradient - 1;
     //Aux variables
-    Matrix *inputGradientMatrix, *inputMatrix, *outputMatrix;
-    unsigned int o, on, om, ln, lm, max, aux_n, aux_m, aux;
+    Matrix *inputMatrix, *inputGradientMatrix, *outputGradientMatrix;
+    unsigned int o, on, om, ln, lm, maxLn, maxLm, max, aux_n, aux_m, aux;
     const uint ln_length = (outputGradient->matrix->n)/(inputGradient->matrix->n), 
                lm_length = (outputGradient->matrix->m)/(inputGradient->matrix->m);
     //Input array loop
     for(o = 0; o < inputGradient->n; o++){
+        inputMatrix = FEATURE_GETMATRIX(input, o);
         inputGradientMatrix = FEATURE_GETMATRIX(inputGradient, o);
-        outputMatrix = FEATURE_GETMATRIX(outputGradient, o);
+        outputGradientMatrix = FEATURE_GETMATRIX(outputGradient, o);
         //Input matrix loop
         for(on = 0; on < inputGradientMatrix->n; on++)
         for(om = 0; om < inputGradientMatrix->m; om++){
             //Subsampling
-            max = 0, aux_n = ln_length*on, aux_m = lm_length*om;
+            max = -1, aux_n = ln_length*on, aux_m = lm_length*om;
             for(ln = 0; ln < ln_length; ln++)
                 for(lm = 0; lm < lm_length; lm++){
-                    aux = MATRIX_VALUE(outputMatrix, (aux_n + ln), (aux_m + lm));
-                    max = aux > max ? aux:max;
+                    aux = MATRIX_VALUE(inputMatrix, (aux_n + ln), (aux_m + lm));
+                    if(aux > max)
+                        max = aux, maxLn = (aux_n + ln), maxLm = (aux_m + lm);
                 }
-            MATRIX_VALUE(outputMatrix, on, om) = max;
+            MATRIX_VALUE(outputGradientMatrix, maxLn, maxLm) = MATRIX_VALUE(inputGradientMatrix, on, om);
         }
     }
 }
