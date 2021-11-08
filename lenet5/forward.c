@@ -1,7 +1,18 @@
 #include "lenet.h"
 
 /* ----- FORWARD FUNCTIONS ----- */
-void convolute_forward(Matrix *input, Matrix *weight, Array *bias , Matrix *output ){
+void activation_forward(Feature *output, Array *bias){
+    uint wn, wm, matrixSize;
+    Matrix *outputMatrix;
+    for(wn = 0; wn < output->n; wn++){
+        outputMatrix = FEATURE_GETMATRIX(output, wn);
+        matrixSize = MATRIX_SIZE(outputMatrix);
+        for(wm = 0; wm < matrixSize; wm++)
+            MATRIX_VALUE1(outputMatrix, wm) = ReLU(MATRIX_VALUE1(outputMatrix, wm) + ARRAY_VALUE(bias, wn));
+    }
+}
+
+void convolute_forward(Matrix *input, Matrix *weight, Matrix *output ){
     //Aux variables
     uint on, om, wn, wm;
     //Output loop
@@ -17,31 +28,20 @@ void convolute_forward(Matrix *input, Matrix *weight, Array *bias , Matrix *outp
 }
 
 void convolution_forward(Feature *input, LeNet lenet){
-    //Output malloc
     Feature *output = input + 1;
-    //FEATURE_MALLOCMATRIX(output);
     //Aux variables
     uint wn, wm;
     //Convolution
     for(wn = 0; wn < lenet.weight->n; wn++)
     for(wm = 0; wm < lenet.weight->m; wm++)
-        convolute_1(FEATURE_GETMATRIX(input, wn), WEIGHT_GETMATRIX(lenet.weight, wn, wm), 
-                    lenet.bias, FEATURE_GETMATRIX(output, wm));
+        convolute_forward(FEATURE_GETMATRIX(input, wn), WEIGHT_GETMATRIX(lenet.weight, wn, wm), 
+                          FEATURE_GETMATRIX(output, wm));
     //Activation function
-    uint matrixSize;
-    Matrix *outputMatrix;
-    for(wn = 0; wn < output->n; wn++){
-        outputMatrix = FEATURE_GETMATRIX(output, wn);
-        matrixSize = MATRIX_SIZE(outputMatrix);
-        for(wm = 0; wm < matrixSize; wm++)
-            MATRIX_VALUE1(outputMatrix, wm) = ReLU(MATRIX_VALUE1(outputMatrix, wm) + ARRAY_VALUE(lenet.bias, wn));
-    }
+    activation_forward(output, lenet.bias);
 }
 
 void subsampling_forward(Feature *input){
-    //Output malloc
     Feature *output = input + 1;
-    //FEATURE_MALLOCMATRIX(output);
     //Aux variables
     Matrix *mo;
     unsigned int o, on, om, ln, lm, max, aux_n, aux_m, aux;
@@ -62,14 +62,10 @@ void subsampling_forward(Feature *input){
             MATRIX_VALUE(mo, on, om) = max;
         }
     }
-    //Free memory
-    //FEATURE_FREEMATRIX(input);
 }
 
 void dotproduct_forward(Feature *input, LeNet lenet){
-    //Output malloc
     Feature *output = input + 1;
-    //FEATURE_MALLOCMATRIX(output);
     //Aux variables
     uint wn1, wn2, wm, wn1_aux;
     Matrix *inputMatrix;
@@ -82,11 +78,8 @@ void dotproduct_forward(Feature *input, LeNet lenet){
         wn1_aux = wn1*wn2_length;
         for(wn2 = 0; wn2 < wn2_length; wn2++)
         for(wm = 0; wm < weightMatrix->m; wm++)
-            MATRIX_VALUE(outputMatrix, 0, wm) += MATRIX_VALUE1(inputMatrix, wn2) * MATRIX_VALUE(weightMatrix, (wn1_aux+wn2), wm);
+            MATRIX_VALUE1(outputMatrix, wm) += MATRIX_VALUE1(inputMatrix, wn2) * MATRIX_VALUE(weightMatrix, (wn1_aux+wn2), wm);
     }
-    //Activation function + bias
-    for(wm = 0; wm < outputMatrix->m; wm++)
-        MATRIX_VALUE(outputMatrix, 0, wm) = ReLU(MATRIX_VALUE(outputMatrix, 0, wm) + ARRAY_VALUE(lenet.bias, wm));
-    //Free memory
-    //FEATURE_FREEMATRIX(input);
+    //Activation function
+    activation_forward(output, lenet.bias);
 }
