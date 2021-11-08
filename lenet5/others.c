@@ -1,6 +1,14 @@
 #include "lenet.h"
 
 /* ----- OTHERS FUNCTIONS ----- */
+number ReLU(number x){
+    return x*(x > 0);
+}
+
+number ReLU_GRAD(number y){
+    return y > 0;
+}
+
 void softMax(Feature *input, Array *target, Feature *featureGradient){
     //Aux variables
     uint om;

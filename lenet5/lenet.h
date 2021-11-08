@@ -47,21 +47,21 @@ int testing(LeNet *lenet, image *test_data, uint8 *test_label,int total_size);
 uint8 getResult(Feature *features, uint8 count);
 
 /* ----- FORWARD ----- */
-void activation_forward(Feature *output, Array *bias);
+void activation_fordward(Feature *output, Array *bias, number (*action)(number));
 void convolute_forward(Matrix *input, Matrix *weight, Matrix *output );
 void convolution_forward(Feature *input, LeNet lenet);
 void subsampling_forward(Feature *input);
 void dotproduct_forward(Feature *input, LeNet lenet);
 
 /* ----- BACKWARD ----- */
-void activation_backward(Feature *output, Array *bias);
+void activation_backward(Feature *output, number (*action)(number));
 void convolute_backward(Matrix *input, Matrix *weight, Matrix *output);
 void convolution_backward(Feature *input, LeNet lenet, Feature *inputGradient, LeNet gradientLenet);
-void subsampling_backward(Feature *input);
+void subsampling_backward(Feature *input, Feature *inputGradient);
 void dotproduct_backward(Feature *input, LeNet lenet, Feature *inputGradient, LeNet gradientLenet);
 
 /* ----- OTHERS ----- */
-#define ReLU(x) (x>0?x: 0)
-#define ReLU_GRAD(x) (x>0)
 void softMax(Feature *input, Array *target, Feature *gradient);
 number costFunction(Feature *input, Array *target);
+number ReLU(number x);
+number ReLU_GRAD(number x);

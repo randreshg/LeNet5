@@ -1,14 +1,14 @@
 #include "lenet.h"
 
 /* ----- FORWARD FUNCTIONS ----- */
-void activation_forward(Feature *output, Array *bias){
-    uint wn, wm, matrixSize;
+void activation_forward(Feature *output, Array *bias, number (*action)(number)){
+    uint on, om, matrixSize;
     Matrix *outputMatrix;
-    for(wn = 0; wn < output->n; wn++){
-        outputMatrix = FEATURE_GETMATRIX(output, wn);
+    for(on = 0; on < output->n; on++){
+        outputMatrix = FEATURE_GETMATRIX(output, on);
         matrixSize = MATRIX_SIZE(outputMatrix);
-        for(wm = 0; wm < matrixSize; wm++)
-            MATRIX_VALUE1(outputMatrix, wm) = ReLU(MATRIX_VALUE1(outputMatrix, wm) + ARRAY_VALUE(bias, wn));
+        for(om = 0; om < matrixSize; om++)
+            MATRIX_VALUE1(outputMatrix, om) = action(MATRIX_VALUE1(outputMatrix, om) + ARRAY_VALUE(bias, on));
     }
 }
 
@@ -37,29 +37,30 @@ void convolution_forward(Feature *input, LeNet lenet){
         convolute_forward(FEATURE_GETMATRIX(input, wn), WEIGHT_GETMATRIX(lenet.weight, wn, wm), 
                           FEATURE_GETMATRIX(output, wm));
     //Activation function
-    activation_forward(output, lenet.bias);
+    activation_forward(output, lenet.bias, ReLU);
 }
 
 void subsampling_forward(Feature *input){
     Feature *output = input + 1;
     //Aux variables
-    Matrix *mo;
+    Matrix *inputMatrix, *outputMatrix;
     unsigned int o, on, om, ln, lm, max, aux_n, aux_m, aux;
     const uint ln_length = (input->matrix->n)/(output->matrix->n), lm_length = (input->matrix->m)/(output->matrix->m);
     //Ouput array loop
     for(o = 0; o < output->n; o++){
-        mo = FEATURE_GETMATRIX(output, o);
+        inputMatrix = FEATURE_GETMATRIX(input, o);
+        outputMatrix = FEATURE_GETMATRIX(output, o);
         //Output matrix loop
-        for(on = 0; on < mo->n; on++)
-        for(om = 0; om < mo->m; om++){
+        for(on = 0; on < outputMatrix->n; on++)
+        for(om = 0; om < outputMatrix->m; om++){
             //Subsampling
             max = 0, aux_n = ln_length*on, aux_m = lm_length*om;
             for(ln = 0; ln < ln_length; ln++)
                 for(lm = 0; lm < lm_length; lm++){
-                    aux = MATRIX_VALUE(FEATURE_GETMATRIX(input, o), (aux_n + ln), (aux_m + lm));
+                    aux = MATRIX_VALUE(inputMatrix, (aux_n + ln), (aux_m + lm));
                     max = aux > max ? aux:max;
                 }
-            MATRIX_VALUE(mo, on, om) = max;
+            MATRIX_VALUE(outputMatrix, on, om) = max;
         }
     }
 }
@@ -81,5 +82,5 @@ void dotproduct_forward(Feature *input, LeNet lenet){
             MATRIX_VALUE1(outputMatrix, wm) += MATRIX_VALUE1(inputMatrix, wn2) * MATRIX_VALUE(weightMatrix, (wn1_aux+wn2), wm);
     }
     //Activation function
-    activation_forward(output, lenet.bias);
+    activation_forward(output, lenet.bias, ReLU);
 }
