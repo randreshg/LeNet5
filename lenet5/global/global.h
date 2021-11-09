@@ -4,7 +4,6 @@
 typedef enum { false, true } bool;
 typedef unsigned char uint8;
 typedef unsigned int uint;
-typedef uint8 image[28][28];
 typedef float number;
 
 typedef struct feature Feature;
@@ -25,7 +24,7 @@ struct array
     number *p;
 };
 #define ARRAY_VALUE(ar, n) *((ar)->p+n)
-extern void ARRAY_FREE(Array **a);
+extern void ARRAY_FREE(Array **ar);
 extern Array *ARRAY(uint n);
 
 /* ----- FEATURE ----- */
@@ -34,10 +33,10 @@ struct feature
     uint n;
     Matrix **matrix;
 };
-#define FEATURE_GETMATRIX(f, na) ((f)->matrix + na)
-#define FEATURE_MALLOCMATRIX(f) (f)->matrix = malloc(sizeof(Matrix *)*((f)->n))
-extern void FEATURE_FREE(Feature **w);
-extern Feature *FEATURE(uint8 n, uint8 fl);
+#define FEATURE_GETMATRIX(fe, na) ((fe)->matrix + na)
+#define FEATURE_MALLOCMATRIX(fe) (fe)->matrix = malloc(sizeof(Matrix *)*((fe)->n))
+extern void FEATURE_FREE(Feature **fe);
+extern Feature *FEATURE(uint n, uint fm_n, uint fm_m);
 
 
 /* ----- MATRIX ----- */
@@ -59,10 +58,10 @@ struct weight
     Matrix **matrix;
 };
 
-#define WEIGHT_GETMATRIX(w, ni, mi) ((w)->matrix + ni*((w)->m) + mi)
-#define WEIGHT_GETMATRIX1(w, i) ((w)->matrix + i)
-#define WEIGHT_MALLOCMATRIX(w) (w)->matrix = malloc(sizeof(Matrix *)*((w)->n)*((w)->m))
-#define WEIGHT_SIZE(w) (((w)->n)*((w)->m))
-extern void WEIGHT_FREE(Weight **w);
+#define WEIGHT_GETMATRIX(we, ni, mi) ((we)->matrix + ni*((we)->m) + mi)
+#define WEIGHT_GETMATRIX1(we, i) ((we)->matrix + i)
+#define WEIGHT_MALLOCMATRIX(we) (we)->matrix = malloc(sizeof(Matrix *)*((we)->n)*((we)->m))
+#define WEIGHT_SIZE(we) (((we)->n)*((we)->m))
+extern void WEIGHT_FREE(Weight **we);
 extern Weight *WEIGHT(uint n, uint m, uint wm_n, uint wm_m);
 

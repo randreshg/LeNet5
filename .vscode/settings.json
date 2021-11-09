@@ -5,6 +5,7 @@
         "global.h": "c",
         "weight.h": "c",
         "feature.h": "c",
-        "math.h": "c"
+        "math.h": "c",
+        "lenet.h": "c"
     }
 }

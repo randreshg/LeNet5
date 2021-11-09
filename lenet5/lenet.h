@@ -1,5 +1,6 @@
 #pragma once
 #include "global/global.h"
+#include "mnist.h"
 
 /* ----- CONSTANTS ----- */
 #define LENGTH_KERNEL   5
@@ -29,16 +30,20 @@ typedef struct
 
 /* ----- CONSTRUCTOR ----- */
 extern LeNet *LENET(uint n, uint m, uint wm_n, uint wm_m);
+extern void freeLenet(LeNet **lenet);
 
 /* ----- FUNCTIONS ----- */
-extern void forwardPropagation(LeNet *lenet, Feature *features);
-extern void backwardPropagation(LeNet *lenet, Feature *features);
-
-extern void initialValues(LeNet *lenet);
-extern void initial(LeNet **lenet);
-extern void training(double ***data);
-extern uint8 predict(LeNet *lenet, image input, uint8 count);
+//Others
+void loadInput(float *input, Feature *feature);
+extern uint8 predict(LeNet **lenet, float *input, uint8 count);
 extern uint8 getResult(Feature *features, uint8 count);
+//Propagation
+extern void forwardPropagation(LeNet *lenet, Feature **features);
+extern void backwardPropagation(LeNet *lenet, Feature *features);
+//Initial values
+extern void initialValues(LeNet *lenet);
+extern void LENET_INITIAL(LeNet **lenet);
+extern void FEATURES_INITIAL(Feature **features);
 
 /* ----- FORWARD ----- */
 extern void activation_forward(Feature *output, Array *bias, number (*action)(number));
@@ -60,4 +65,4 @@ extern number costFunction(Feature *input, Array *target);
 extern number ReLU(number x);
 extern number ReLU_GRAD(number x);
 #define f32Rand(a) ((float)rand()/(float)(RAND_MAX)) * a;
-extern void freeLenet();
+
