@@ -28,14 +28,14 @@ typedef struct
 } LeNet;
 
 /* ----- CONSTRUCTOR ----- */
-extern LeNet *LENET(uint n, uint m);
+extern LeNet *LENET(uint n, uint m, uint wm_n, uint wm_m);
 
 /* ----- FUNCTIONS ----- */
 extern void forwardPropagation(LeNet *lenet, Feature *features);
 extern void backwardPropagation(LeNet *lenet, Feature *features);
 
-extern void initialValues(double ***data);
-extern void initial(LeNet *lenet);
+extern void initialValues(LeNet *lenet);
+extern void initial(LeNet **lenet);
 extern void training(double ***data);
 extern uint8 predict(LeNet *lenet, image input, uint8 count);
 extern int testing(LeNet *lenet, image *test_data, uint8 *test_label,int total_size);
@@ -60,3 +60,5 @@ extern void softMax(Feature *input, Array *target, Feature *gradient);
 extern number costFunction(Feature *input, Array *target);
 extern number ReLU(number x);
 extern number ReLU_GRAD(number x);
+#define f32Rand(a) ((float)rand()/(float)(RAND_MAX)) * a;
+extern void freeLenet();

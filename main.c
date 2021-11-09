@@ -1,7 +1,6 @@
 //gcc -o main main.c lenet5/lenet.c lenet5/backward.c lenet5/forward.c lenet5/others.c
 #include <stdlib.h>
 #include <stdio.h>
-#include <time.h>
 #include "lenet5/lenet.h"
 #define FILE_TRAIN_IMAGE		"train-images-idx3-ubyte"
 #define FILE_TRAIN_LABEL		"train-labels-idx1-ubyte"
@@ -47,12 +46,11 @@ int read_data(unsigned char(*data)[28][28], unsigned char label[], const int cou
 
 int main()
 {
-    LeNet **lenet = malloc(LAYERS*sizeof(LeNet));
-    lenet[0] = LENET(INPUT, LAYER1);
-    lenet[1] = LENET(LAYER2, LAYER3);
-    lenet[2] = LENET(LAYER4, LAYER5);
-    lenet[3] = LENET(1, 1);
-    printf("TEST: %d \n", lenet[0]->bias->n);
+    LeNet *lenet = malloc(LAYERS*sizeof(LeNet));
+    initial(&lenet);
+    Matrix *m = *WEIGHT_GETMATRIX(lenet[0].weight, 0, 5);
+    printf("MATRIX SIZE: %u \n", MATRIX_SIZE(m));
+    printf("TEST: %f \n", MATRIX_VALUE(m, 0, 0));
     // image *train_data = (image *)calloc(COUNT_TRAIN, sizeof(image));
     // uint8 *train_label = (uint8 *)calloc(COUNT_TRAIN, sizeof(uint8));
     // image *test_data = (image *)calloc(COUNT_TEST, sizeof(image));
@@ -92,6 +90,7 @@ int main()
     // free(train_label);
     // free(test_data);
     // free(test_label);
+    freeLenet();
     return 0;
 }
 
