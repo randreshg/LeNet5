@@ -1,5 +1,5 @@
 #pragma once
-#include "global.h"
+#include "global/global.h"
 
 /* ----- CONSTANTS ----- */
 #define LENGTH_KERNEL   5
@@ -28,40 +28,40 @@ typedef struct
 } LeNet;
 
 /* ----- CONSTRUCTORS ----- */
-LeNet *LENET(uint n, uint m){
+static LeNet *LENET(uint n, uint m){
     LeNet *le = (LeNet *)malloc(sizeof(LeNet));
     le->weight = WEIGHT(n, m);
     le->bias = ARRAY(m);
+    return le;
 }
 
 /* ----- FUNCTIONS ----- */
-void forwardPropagation(LeNet *lenet, Feature *features);
-void backwardPropagation(LeNet *lenet, Feature *features);
+extern void forwardPropagation(LeNet *lenet, Feature *features);
+extern void backwardPropagation(LeNet *lenet, Feature *features);
 
-
-void initialValues(double ***data);
-void initial(LeNet *lenet);
-void training(double ***data);
-uint8 predict(LeNet *lenet, image input, uint8 count);
-int testing(LeNet *lenet, image *test_data, uint8 *test_label,int total_size);
-uint8 getResult(Feature *features, uint8 count);
+extern void initialValues(double ***data);
+extern void initial(LeNet *lenet);
+extern void training(double ***data);
+extern uint8 predict(LeNet *lenet, image input, uint8 count);
+extern int testing(LeNet *lenet, image *test_data, uint8 *test_label,int total_size);
+extern uint8 getResult(Feature *features, uint8 count);
 
 /* ----- FORWARD ----- */
-void activation_fordward(Feature *output, Array *bias, number (*action)(number));
-void convolute_forward(Matrix *input, Matrix *weight, Matrix *output );
-void convolution_forward(Feature *input, LeNet lenet);
-void subsampling_forward(Feature *input);
-void dotproduct_forward(Feature *input, LeNet lenet);
+extern void activation_forward(Feature *output, Array *bias, number (*action)(number));
+extern void convolute_forward(Matrix *input, Matrix *weight, Matrix *output );
+extern void convolution_forward(Feature *input, LeNet lenet);
+extern void subsampling_forward(Feature *input);
+extern void dotproduct_forward(Feature *input, LeNet lenet);
 
 /* ----- BACKWARD ----- */
-void activation_backward(Feature *output, number (*action)(number));
-void convolute_backward(Matrix *input, Matrix *weight, Matrix *output);
-void convolution_backward(Feature *input, LeNet lenet, Feature *inputGradient, LeNet gradientLenet);
-void subsampling_backward(Feature *input, Feature *inputGradient);
-void dotproduct_backward(Feature *input, LeNet lenet, Feature *inputGradient, LeNet gradientLenet);
+extern void activation_backward(Feature *output, number (*action)(number));
+extern void convolute_backward(Matrix *input, Matrix *weight, Matrix *output);
+extern void convolution_backward(Feature *input, LeNet lenet, Feature *inputGradient, LeNet gradientLenet);
+extern void subsampling_backward(Feature *input, Feature *inputGradient);
+extern void dotproduct_backward(Feature *input, LeNet lenet, Feature *inputGradient, LeNet gradientLenet);
 
 /* ----- OTHERS ----- */
-void softMax(Feature *input, Array *target, Feature *gradient);
-number costFunction(Feature *input, Array *target);
-number ReLU(number x);
-number ReLU_GRAD(number x);
+extern void softMax(Feature *input, Array *target, Feature *gradient);
+extern number costFunction(Feature *input, Array *target);
+extern number ReLU(number x);
+extern number ReLU_GRAD(number x);

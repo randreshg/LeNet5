@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "array.h": "c",
+        "matrix.h": "c",
+        "global.h": "c",
+        "weight.h": "c",
+        "feature.h": "c",
+        "math.h": "c"
+    }
+}
