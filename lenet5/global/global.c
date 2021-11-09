@@ -1,10 +1,17 @@
 #include "global.h"
 
+/* ----- ARRAY ----- */
 Array *ARRAY(uint n){
     Array *ar = (Array *)malloc(sizeof(Array));
     ar->n = n, ar->p = calloc(n, sizeof(number));
     return ar;
 }
+
+void ARRAY_FREE(Array **a){
+    free((*a)->p);
+    free(*a);
+    *a = NULL;
+} 
 
 /* ----- FEATURE ----- */
 Feature *FEATURE(uint8 n, uint8 fl){
@@ -13,12 +20,13 @@ Feature *FEATURE(uint8 n, uint8 fl){
     return fe;
 }
 
-void FEATURE_FREE(Feature *f){
+void FEATURE_FREE(Feature **f){
     uint i;
-    for(i=0; i<f->n; i++)
-        MATRIX_FREE(*FEATURE_GETMATRIX(f, i));
-    free(f->matrix);
-    free(f);
+    for(i=0; i<(*f)->n; i++)
+        MATRIX_FREE(FEATURE_GETMATRIX(*f, i));
+    free((*f)->matrix);
+    free(*f);
+    *f = NULL;
 } 
 
 /* ----- MATRIX ----- */
@@ -27,6 +35,12 @@ Matrix *MATRIX(number n, number m){
     ma->n = n, ma->m = m;
     ma->p = calloc(n*m, sizeof(number));
     return ma;
+}
+
+void MATRIX_FREE(Matrix **m){
+    free((*m)->p);
+    free(*m);
+    *m = NULL;
 }
 
 /* ----- WEIGHT ----- */
@@ -41,10 +55,11 @@ Weight *WEIGHT(uint n, uint m, uint wm_n, uint wm_m){
     return we;
 }
 
-void WEIGHT_FREE(Weight *w){
-    uint i, size = w->n*w->m;
+void WEIGHT_FREE(Weight **w){
+    uint i, size = ((*w)->n)*((*w)->m);
     for(i=0; i<size; i++)
-        MATRIX_FREE(*WEIGHT_GETMATRIX1(w, i));
-    free(w->matrix);
-    free(w);
+        MATRIX_FREE(WEIGHT_GETMATRIX1(*w, i));
+    free((*w)->matrix);
+    free(*w);
+    *w = NULL;
 } 

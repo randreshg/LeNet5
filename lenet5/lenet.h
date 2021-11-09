@@ -38,7 +38,6 @@ extern void initialValues(LeNet *lenet);
 extern void initial(LeNet **lenet);
 extern void training(double ***data);
 extern uint8 predict(LeNet *lenet, image input, uint8 count);
-extern int testing(LeNet *lenet, image *test_data, uint8 *test_label,int total_size);
 extern uint8 getResult(Feature *features, uint8 count);
 
 /* ----- FORWARD ----- */

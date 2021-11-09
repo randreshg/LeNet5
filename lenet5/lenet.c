@@ -25,7 +25,6 @@ void initialValues(LeNet *lenet){
             }
         }
     }
-    printf("OK\n");
 }
 
 void initial(LeNet **lenet){
@@ -33,7 +32,7 @@ void initial(LeNet **lenet){
     lenet[0] = LENET(INPUT, LAYER1, LENGTH_KERNEL, LENGTH_KERNEL);
     lenet[1] = LENET(LAYER2, LAYER3, LENGTH_KERNEL, LENGTH_KERNEL);
     lenet[2] = LENET(LAYER4, LAYER5, LENGTH_KERNEL, LENGTH_KERNEL);
-    //lenet[3] = LENET(1, 1, LAYER5 * LENGTH_FEATURE5 * LENGTH_FEATURE5, OUTPUT);
+    lenet[3] = LENET(1, 1, LAYER5 * LENGTH_FEATURE5 * LENGTH_FEATURE5, OUTPUT);
 }
 
 void forwardPropagation(LeNet *lenet, Feature *features){
@@ -54,8 +53,10 @@ void backwardPropagation(LeNet *lenet, Feature *features){
     // dotproduct_backward(features+5, *lenet);
 }
 
-extern void freeLenet(){
-    for(int i=0; i<LAYERS; i++){
-        
+void freeLenet(LeNet **lenet){
+    for(int i=0; i<4; i++){
+        WEIGHT_FREE(&(lenet[i]->weight));
+        ARRAY_FREE(&(lenet[i]->bias));
+        free(lenet[i]);
     }
 }
