@@ -7,8 +7,8 @@
 #define FILE_TRAIN_LABEL		"train-labels-idx1-ubyte"
 #define FILE_TEST_IMAGE		"t10k-images-idx3-ubyte"
 #define FILE_TEST_LABEL		"t10k-labels-idx1-ubyte"
-#define LENET_FILE 		"model.dat"
-#define LENET_FILE1 		"model1.dat"
+#define LENET1_FILE 		"model.dat"
+#define LENET1_FILE1 		"model1.dat"
 #define COUNT_TRAIN		60000
 #define COUNT_TEST		10000
 
@@ -52,7 +52,7 @@ int main()
     lenet[1] = LENET(LAYER2, LAYER3);
     lenet[2] = LENET(LAYER4, LAYER5);
     lenet[3] = LENET(1, 1);
-    printf("TEST: %d", lenet[0]->bias->n);
+    printf("TEST: %d \n", lenet[0]->bias->n);
     // image *train_data = (image *)calloc(COUNT_TRAIN, sizeof(image));
     // uint8 *train_label = (uint8 *)calloc(COUNT_TRAIN, sizeof(uint8));
     // image *test_data = (image *)calloc(COUNT_TEST, sizeof(image));

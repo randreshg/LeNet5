@@ -1,5 +1,5 @@
-lenet: main.o global.o lenet.o backward.o forward.o others.o
-	gcc -o lenet main.o global.o lenet.o backward.o forward.o others.o -lm
+lenetcnn: main.o lenet.o backward.o forward.o others.o global.o
+	gcc -o lenetcnn main.o lenet.o backward.o forward.o others.o global.o -lm
 
 main.o: main.c
 	gcc -c -g main.c

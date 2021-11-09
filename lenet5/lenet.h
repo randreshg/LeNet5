@@ -27,13 +27,8 @@ typedef struct
     Array *bias;
 } LeNet;
 
-/* ----- CONSTRUCTORS ----- */
-static LeNet *LENET(uint n, uint m){
-    LeNet *le = (LeNet *)malloc(sizeof(LeNet));
-    le->weight = WEIGHT(n, m);
-    le->bias = ARRAY(m);
-    return le;
-}
+/* ----- CONSTRUCTOR ----- */
+extern LeNet *LENET(uint n, uint m);
 
 /* ----- FUNCTIONS ----- */
 extern void forwardPropagation(LeNet *lenet, Feature *features);

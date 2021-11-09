@@ -1,5 +1,12 @@
 #include "lenet.h"
 
+LeNet *LENET(uint n, uint m){
+    LeNet *le = (LeNet *)malloc(sizeof(LeNet));
+    le->weight = WEIGHT(n, m);
+    le->bias = ARRAY(m);
+    return le;
+}
+
 void model(){
     
 }
