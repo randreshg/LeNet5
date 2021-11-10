@@ -5,31 +5,7 @@ https://github.com/takafumihoriuchi/MNIST_for_C
 Edited by: Rafael Herrera /2021
 */
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <string.h>
-
-// set appropriate path for data
-#define TRAIN_IMAGE "./data/train-images.idx3-ubyte"
-#define TRAIN_LABEL "./data/train-labels.idx1-ubyte"
-#define TEST_IMAGE "./data/t10k-images.idx3-ubyte"
-#define TEST_LABEL "./data/t10k-labels.idx1-ubyte"
-
-#define IMG_SIZE 784 // 28*28
-#define NUM_TRAIN 60000
-#define NUM_TEST 10000
-#define LEN_INFO_IMAGE 4
-#define LEN_INFO_LABEL 2
-
-#define MAX_IMAGESIZE 1280
-#define MAX_BRIGHTNESS 255
-#define MAX_FILENAME 256
-#define MAX_NUM_OF_IMAGES 1
-
-int width[MAX_NUM_OF_IMAGES], height[MAX_NUM_OF_IMAGES];
-
+#include "mnist.h"
 
 void FlipLong(unsigned char * ptr)
 {
@@ -47,7 +23,6 @@ void FlipLong(unsigned char * ptr)
     *(ptr+1) = val;
 }
 
-
 void read_mnist_char(char *file_path, int num_data, int len_info, int arr_n, unsigned char data_char[][arr_n], int info_arr[])
 {
     int i, j, k, fd;
@@ -57,21 +32,17 @@ void read_mnist_char(char *file_path, int num_data, int len_info, int arr_n, uns
         fprintf(stderr, "couldn't open image file");
         exit(-1);
     }
-    
     read(fd, info_arr, len_info * sizeof(int));
-    
     // read-in information about size of data
     for (i=0; i<len_info; i++) { 
         ptr = (unsigned char *)(info_arr + i);
         FlipLong(ptr);
         ptr = ptr + sizeof(int);
     }
-    
     // read-in mnist numbers (pixels|labels)
     for (i=0; i<num_data; i++) {
         read(fd, data_char[i], arr_n * sizeof(unsigned char));
     }
-
     close(fd);
 }
 
@@ -148,51 +119,51 @@ void print_mnist_label(int data_label[], int num_data, int train_label[NUM_TRAIN
 }
 
 
-// name: path for saving image (ex: "./images/sample.pgm")
-void save_image(int n, char name[], unsigned char image[MAX_NUM_OF_IMAGES][MAX_IMAGESIZE][MAX_IMAGESIZE])
-{
-    char file_name[MAX_FILENAME];
-    FILE *fp;
-    int x, y;
+// // name: path for saving image (ex: "./images/sample.pgm")
+// void save_image(int n, char name[], unsigned char image[MAX_NUM_OF_IMAGES][MAX_IMAGESIZE][MAX_IMAGESIZE])
+// {
+//     char file_name[MAX_FILENAME];
+//     FILE *fp;
+//     int x, y;
 
-    if (name[0] == '\0') {
-        printf("output file name (*.pgm) : ");
-        scanf("%s", file_name);
-    } else strcpy(file_name, name);
+//     if (name[0] == '\0') {
+//         printf("output file name (*.pgm) : ");
+//         scanf("%s", file_name);
+//     } else strcpy(file_name, name);
 
-    if ( (fp=fopen(file_name, "wb"))==NULL ) {
-        printf("could not open file\n");
-        exit(1);
-    }
+//     if ( (fp=fopen(file_name, "wb"))==NULL ) {
+//         printf("could not open file\n");
+//         exit(1);
+//     }
 
-    fputs("P5\n", fp);
-    fputs("# Created by Image Processing\n", fp);
-    fprintf(fp, "%d %d\n", width[n], height[n]);
-    fprintf(fp, "%d\n", MAX_BRIGHTNESS);
-    for (y=0; y<height[n]; y++)
-        for (x=0; x<width[n]; x++)
-            fputc(image[n][x][y], fp);
-    fclose(fp);
-    printf("Image was saved successfully\n");
-}
+//     fputs("P5\n", fp);
+//     fputs("# Created by Image Processing\n", fp);
+//     fprintf(fp, "%d %d\n", width[n], height[n]);
+//     fprintf(fp, "%d\n", MAX_BRIGHTNESS);
+//     for (y=0; y<height[n]; y++)
+//         for (x=0; x<width[n]; x++)
+//             fputc(image[n][x][y], fp);
+//     fclose(fp);
+//     printf("Image was saved successfully\n");
+// }
 
 
 // save mnist image (call for each image)
 // store train_image[][] into image[][][]
-void save_mnist_pgm(float data_image[][IMG_SIZE], int index)
-{
-    unsigned char image[MAX_NUM_OF_IMAGES][MAX_IMAGESIZE][MAX_IMAGESIZE];
-    int n = 0; // id for image (set to 0)
-    int x, y;
+// void save_mnist_pgm(float data_image[][IMG_SIZE], int index)
+// {
+//     unsigned char image[MAX_NUM_OF_IMAGES][MAX_IMAGESIZE][MAX_IMAGESIZE];
+//     int n = 0; // id for image (set to 0)
+//     int x, y;
 
-    width[n] = 28;
-    height[n] = 28;
+//     width[n] = 28;
+//     height[n] = 28;
 
-    for (y=0; y<height[n]; y++) {
-        for (x=0; x<width[n]; x++) {
-            image[n][x][y] = data_image[index][y * width[n] + x] * 255.0;
-        }
-    }
+//     for (y=0; y<height[n]; y++) {
+//         for (x=0; x<width[n]; x++) {
+//             image[n][x][y] = data_image[index][y * width[n] + x] * 255.0;
+//         }
+//     }
 
-    save_image(n, "", image);
-}
+//     save_image(n, "", image);
+// }

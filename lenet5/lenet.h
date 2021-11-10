@@ -1,7 +1,6 @@
 #pragma once
 #include "global/global.h"
-#include "mnist.h"
-
+#include "mnist/mnist.h"
 /* ----- CONSTANTS ----- */
 #define LENGTH_KERNEL   5
 //Features

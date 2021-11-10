@@ -6,6 +6,7 @@
         "weight.h": "c",
         "feature.h": "c",
         "math.h": "c",
-        "lenet.h": "c"
+        "lenet.h": "c",
+        "mnist.h": "c"
     }
 }

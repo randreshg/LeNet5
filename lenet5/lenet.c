@@ -24,8 +24,8 @@ void freeFeatures(Feature **features){
 }
 
 // ----- Others ----- //
-void loadInput(float input[IMG_SIZE], Feature *feature){
-    *(feature->matrix);
+void loadInput(float input[28*28], Feature *feature){
+    
 
   char str1[] = "Geeks"; 
   char str2[] = "Quiz"; 
@@ -45,6 +45,7 @@ uint8 predict(LeNet **lenet, float *input, uint8 count)
 {
     Feature **features = malloc((LAYERS+1)*sizeof(Feature *));;
     FEATURES_INITIAL(features);
+    printf("OK \n");
     //load_input(*features, input);
     //forwardPropagation(lenet, features);
     //return get_result(&features, count);

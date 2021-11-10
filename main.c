@@ -36,24 +36,24 @@ uint testing(LeNet **lenet, float *test_data[IMG_SIZE], uint8 *test_label, uint 
 int main()
 {
     bool training = false;
-    if(training){
-        //Read training data
-        float train_image[NUM_TRAIN][IMG_SIZE];
-        uint8 train_label[NUM_TRAIN];
-        load_trainingData(train_image, train_label);
-    }
-    //Read testing data
-    float test_image[NUM_TEST][IMG_SIZE];
-    uint8 test_label[NUM_TEST];
-    load_trainingData(test_image, test_label);
+    // if(training){
+    //     //Read training data
+    //     float train_image[NUM_TRAIN][IMG_SIZE];
+    //     uint8 train_label[NUM_TRAIN];
+    //     load_trainingData(train_image, train_label);
+    // }
+    // printf("OK \n");
+    // //Read testing data
+    
+    //load_trainingData(test_image, test_label);
 
     //Malloc 
-    LeNet *lenet = malloc(4*sizeof(LeNet *));;
+    LeNet **lenet = malloc(4*sizeof(LeNet *));;
     LENET_INITIAL(lenet);
     //Process starts
     clock_t start = clock();
     uint rightPredictions = testing(lenet, test_image, test_label, 1);
-    printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
+    //printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
     //Process ends
     printf("Time: %u\n", (unsigned)(clock() - start));
     freeLenet(lenet);
