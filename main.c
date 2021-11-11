@@ -33,15 +33,7 @@ uint testing(LeNet **lenet, uint8 test_image[][IMG_SIZE], uint8 *test_label, uin
     return rightPredictions;
 }
 
-void training(){
-    //Read training data
-    static uint8 train_image[NUM_TRAIN][IMG_SIZE];
-    static uint8 train_label[NUM_TRAIN];
-    load_trainingData(train_image, train_label);
-    printf("TEST: %d \n", train_label[10]);
-}
-
-void trainBatch(LeNet **lenet, uint8 *input[IMG_SIZE], uint8 *labels, uint batchSize)
+void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, uint batchSize)
 {
     //Aux variables
     uint i;
@@ -57,10 +49,12 @@ void trainBatch(LeNet **lenet, uint8 *input[IMG_SIZE], uint8 *labels, uint batch
         image_char2float(input[i], FEATURE_GETMATRIX(*features, 0)->p);
         //Forward propagaton
         forwardPropagation(lenet, features);
-        //Cost function
-        cost = costFunction(features[6], labels[i]);
         //softMax
         softMax(features[6], labels[i], featuresGradient[6]);
+        //Cost function
+        cost = costFunction(featuresGradient[6], labels[i]);
+        printf("Cost: %f \n", cost);
+        
         //Backward
         //backward(lenet, &deltas, &errors, &features, relugrad);
         //Update weights
@@ -74,19 +68,33 @@ void trainBatch(LeNet **lenet, uint8 *input[IMG_SIZE], uint8 *labels, uint batch
     //     ((double *)lenet)[i] += k * buffer[i];
 }
 
+void training(LeNet **lenet){
+    //Read training data
+    static uint8 train_image[NUM_TRAIN][IMG_SIZE];
+    static uint8 train_label[NUM_TRAIN];
+    load_trainingData(train_image, train_label);
+    trainBatch(lenet, train_image, train_label, 1);
+    // for (int i = 0, percent = 0; i <= total_size - batch_size; i += batch_size)
+    // {
+    //     TrainBatch(lenet, train_data + i, train_label + i, batch_size);
+    //     if (i * 100 / total_size > percent)
+    //         printf("batchsize:%d\ttrain:%2d%%\n", batch_size, percent = i * 100 / total_size);
+    // }
+}
 int main()
 {
-    bool train = false;
+    //Malloc 
+    LeNet **lenet = LENET_INITIAL();
+    //Training
+    bool train = true;
     if(train)
-        training();
+        training(lenet);
     printf("OK \n");
-    //Load test data
+    //Testing
     static uint8 test_image[NUM_TEST][IMG_SIZE]; 
     static uint8 test_label[NUM_TEST];
     load_testData(test_image, test_label);
-    //printf("-%u \n", *test_label);
-    //Malloc 
-    LeNet **lenet = LENET_INITIAL();
+
     //Process starts
     clock_t start = clock();
     uint rightPredictions = testing(lenet, test_image, test_label, 1);

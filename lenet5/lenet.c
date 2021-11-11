@@ -86,7 +86,7 @@ void initialValues(LeNet *lenet){
             matrix = WEIGHT_GETMATRIX(lenet->weight, n, m);
             matrixSize = MATRIX_SIZE(matrix);
             for(i=0; i<matrixSize; i++){
-                MATRIX_VALUE1(matrix, i) = f32Rand(1.0);
+                MATRIX_VALUE1(matrix, i) = f32Rand(0.0000051);
             }
         }
     }
