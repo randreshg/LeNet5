@@ -33,7 +33,7 @@ struct feature
     uint n;
     Matrix **matrix;
 };
-#define FEATURE_GETMATRIX(fe, na) ((fe)->matrix + na)
+#define FEATURE_GETMATRIX(fe, na) (*((fe)->matrix + na))
 #define FEATURE_MALLOCMATRIX(fe) (fe)->matrix = malloc(sizeof(Matrix *)*((fe)->n))
 extern void FEATURE_FREE(Feature **fe);
 extern Feature *FEATURE(uint n, uint fm_n, uint fm_m);
@@ -45,8 +45,8 @@ struct matrix
     uint n, m;
     number *p;
 };
-#define MATRIX_VALUE(ma, ni, mi) *((ma)->p + ni*((ma)->m) + mi)
-#define MATRIX_VALUE1(ma, ni) *((ma)->p + ni)
+#define MATRIX_VALUE(ma, ni, mi) (*((ma)->p + ni*((ma)->m) + mi))
+#define MATRIX_VALUE1(ma, ni) (*((ma)->p + ni))
 #define MATRIX_SIZE(ma) (((ma)->n)*((ma)->m))
 extern void MATRIX_FREE(Matrix **a);
 extern Matrix *MATRIX(number n, number m);
@@ -58,8 +58,8 @@ struct weight
     Matrix **matrix;
 };
 
-#define WEIGHT_GETMATRIX(we, ni, mi) ((we)->matrix + ni*((we)->m) + mi)
-#define WEIGHT_GETMATRIX1(we, i) ((we)->matrix + i)
+#define WEIGHT_GETMATRIX(we, ni, mi) (*((we)->matrix + ni*((we)->m) + mi))
+#define WEIGHT_GETMATRIX1(we, i) (*((we)->matrix + i))
 #define WEIGHT_MALLOCMATRIX(we) (we)->matrix = malloc(sizeof(Matrix *)*((we)->n)*((we)->m))
 #define WEIGHT_SIZE(we) (((we)->n)*((we)->m))
 extern void WEIGHT_FREE(Weight **we);

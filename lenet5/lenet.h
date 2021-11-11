@@ -33,11 +33,10 @@ extern void freeLenet(LeNet **lenet);
 
 /* ----- FUNCTIONS ----- */
 //Others
-void loadInput(float *input, Feature *feature);
-extern uint8 predict(LeNet **lenet, float *input, uint8 count);
+extern uint8 predict(LeNet **lenet, uint8 *input, uint8 count);
 extern uint8 getResult(Feature *features, uint8 count);
 //Propagation
-extern void forwardPropagation(LeNet *lenet, Feature **features);
+extern void forwardPropagation(LeNet **lenet, Feature **features);
 extern void backwardPropagation(LeNet *lenet, Feature *features);
 //Initial values
 extern void initialValues(LeNet *lenet);
@@ -47,7 +46,7 @@ extern void FEATURES_INITIAL(Feature **features);
 /* ----- FORWARD ----- */
 extern void activation_forward(Feature *output, Array *bias, number (*action)(number));
 extern void convolute_forward(Matrix *input, Matrix *weight, Matrix *output );
-extern void convolution_forward(Feature *input, LeNet lenet);
+extern void convolution_forward(Feature **input, LeNet lenet);
 extern void subsampling_forward(Feature *input);
 extern void dotproduct_forward(Feature *input, LeNet lenet);
 

@@ -23,39 +23,23 @@ void freeFeatures(Feature **features){
     }
 }
 
-// ----- Others ----- //
-void loadInput(float input[28*28], Feature *feature){
-    
-
-  char str1[] = "Geeks"; 
-  char str2[] = "Quiz"; 
- 
-  puts("str1 before memcpy ");
-  puts(str1);
- 
-  /* Copies contents of str2 to str1 */
-  memcpy (str1, str2, sizeof(str2));
- 
-  puts("\nstr1 after memcpy ");
-  puts(str1);
- 
-}
-
-uint8 predict(LeNet **lenet, float *input, uint8 count)
+uint8 predict(LeNet **lenet, uint8 *input, uint8 count)
 {
     Feature **features = malloc((LAYERS+1)*sizeof(Feature *));;
     FEATURES_INITIAL(features);
     printf("OK \n");
-    //load_input(*features, input);
-    //forwardPropagation(lenet, features);
+    
+    image_char2float(input, FEATURE_GETMATRIX(*features, 0)->p);
+    //print_mnist_img(FEATURE_GETMATRIX(*features, 0)->p);
+    forwardPropagation(lenet, features);
     //return get_result(&features, count);
     freeFeatures(features);
     return 1;
 }
 
 // ----- Propagation ----- //
-void forwardPropagation(LeNet *lenet, Feature **features){
-    // convolution_forward(features, *lenet);
+void forwardPropagation(LeNet **lenet, Feature **features){
+    convolution_forward(features, *lenet[0]);
     // subsampling_forward(features+1);
     // convolution_forward(features+2, *#include "lenet5/mnist.h"(lenet+1));
     // subsampling_forward(features+3);
@@ -79,7 +63,7 @@ void initialValues(LeNet *lenet){
     
     for(n=0; n<lenet->weight->n; n++){
         for(m=0; m<lenet->weight->m; m++){
-            matrix = *WEIGHT_GETMATRIX(lenet->weight, n, m);
+            matrix = WEIGHT_GETMATRIX(lenet->weight, n, m);
             matrixSize = MATRIX_SIZE(matrix);
             for(i=0; i<matrixSize; i++){
                 MATRIX_VALUE1(matrix, i) = f32Rand(10);
