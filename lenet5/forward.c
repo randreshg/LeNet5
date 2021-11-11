@@ -45,11 +45,12 @@ void subsampling_forward(Feature **input){
     //Aux variables
     Matrix *inputMatrix, *outputMatrix;
     unsigned int o, on, om, ln, lm, max, aux_n, aux_m, aux;
-    const uint ln_length = (input->matrix->n)/(output->matrix->n), lm_length = (input->matrix->m)/(output->matrix->m);
+    const uint ln_length = FEATURE_GETMATRIX(*input, 0)->n / FEATURE_GETMATRIX(output, 0)->n;
+    const uint lm_length = FEATURE_GETMATRIX(*input, 0)->m / FEATURE_GETMATRIX(output, 0)->m;
     //Ouput array loop
     for(o = 0; o < output->n; o++){
-        inputMatrix = *FEATURE_GETMATRIX(input, o);
-        outputMatrix = *FEATURE_GETMATRIX(output, o);
+        inputMatrix = FEATURE_GETMATRIX(*input, o);
+        outputMatrix = FEATURE_GETMATRIX(output, o);
         //Output matrix loop
         for(on = 0; on < outputMatrix->n; on++)
         for(om = 0; om < outputMatrix->m; om++){
@@ -72,10 +73,10 @@ void dotproduct_forward(Feature **input, LeNet lenet){
     Matrix *inputMatrix;
     Matrix *weightMatrix = WEIGHT_GETMATRIX(lenet.weight, 0, 0);
     Matrix *outputMatrix = FEATURE_GETMATRIX(output, 0);
-    const uint wn1_length = input->n, wn2_length = (weightMatrix->n)/wn1_length;
+    const uint wn1_length = (*input)->n, wn2_length = (weightMatrix->n)/wn1_length;
     //Dot product
     for(wn1 = 0; wn1 < wn1_length; wn1++){
-        inputMatrix = FEATURE_GETMATRIX(input, wn1);
+        inputMatrix = FEATURE_GETMATRIX(*input, wn1);
         wn1_aux = wn1*wn2_length;
         for(wn2 = 0; wn2 < wn2_length; wn2++)
         for(wm = 0; wm < weightMatrix->m; wm++)

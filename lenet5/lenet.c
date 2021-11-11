@@ -1,6 +1,6 @@
 #include "lenet.h"
 
-LeNet *LENET(uint n, uint m, uint wm_n, uint wm_m){
+LeNet *LENET(const uint n, const uint m, const uint wm_n, const uint wm_m){
     LeNet *le = (LeNet *)malloc(sizeof(LeNet));
     le->weight = WEIGHT(n, m, wm_n, wm_m);
     le->bias = ARRAY(m);
@@ -17,22 +17,20 @@ void freeLenet(LeNet **lenet){
 }
 
 void freeFeatures(Feature **features){
-    for(int i=0; i<LAYERS+1; i++){
-        MATRIX_FREE((features[i]->matrix));
-        free(features[i]);
-    }
+    for(int i=0; i<LAYERS+1; i++)
+        FEATURE_FREE(features+i);
 }
 
 uint8 predict(LeNet **lenet, uint8 *input, uint8 count)
 {
+    //Malloc features
     Feature **features = malloc((LAYERS+1)*sizeof(Feature *));;
     FEATURES_INITIAL(features);
-    printf("OK \n");
-    
+    //Load input
     image_char2float(input, FEATURE_GETMATRIX(*features, 0)->p);
-    //print_mnist_img(FEATURE_GETMATRIX(*features, 0)->p);
+    //Forward propagation
     forwardPropagation(lenet, features);
-    //return get_result(&features, count);
+    //uint8 result = get_result(features[6], count);
     freeFeatures(features);
     return 1;
 }
@@ -40,11 +38,12 @@ uint8 predict(LeNet **lenet, uint8 *input, uint8 count)
 // ----- Propagation ----- //
 void forwardPropagation(LeNet **lenet, Feature **features){
     convolution_forward(features, *lenet[0]);
-    // subsampling_forward(features+1);
-    // convolution_forward(features+2, *#include "lenet5/mnist.h"(lenet+1));
-    // subsampling_forward(features+3);
-    // convolution_forward(features+4, *(lenet+2));
-    // dotproduct_forward(features+5, *(lenet+3));
+    subsampling_forward(features+1);
+    convolution_forward(features+2, *lenet[1]);
+    subsampling_forward(features+3);
+    convolution_forward(features+4, *lenet[2]);
+    dotproduct_forward(features+5, *lenet[3]);
+    printf("OK \n");
 }
 
 void backwardPropagation(LeNet *lenet, Feature *features){
@@ -77,7 +76,7 @@ void LENET_INITIAL(LeNet **lenet){
     lenet[0] = LENET(INPUT, LAYER1, LENGTH_KERNEL, LENGTH_KERNEL);
     lenet[1] = LENET(LAYER2, LAYER3, LENGTH_KERNEL, LENGTH_KERNEL);
     lenet[2] = LENET(LAYER4, LAYER5, LENGTH_KERNEL, LENGTH_KERNEL);
-    lenet[3] = LENET(1, 1, LAYER5 * LENGTH_FEATURE5 * LENGTH_FEATURE5, OUTPUT);
+    lenet[3] = LENET(1, 1, LAYER5*LENGTH_FEATURE5*LENGTH_FEATURE5, OUTPUT);
 }
 
 void FEATURES_INITIAL(Feature **features){

@@ -28,7 +28,7 @@ Feature *FEATURE(uint n, uint fm_n, uint fm_m){
 void FEATURE_FREE(Feature **fe){
     uint i;
     for(i=0; i<(*fe)->n; i++)
-        MATRIX_FREE(FEATURE_GETMATRIX(*fe, i));
+        MATRIX_FREE(FEATURE_GETMATRIXP(*fe, i));
     free((*fe)->matrix);
     free(*fe);
     *fe = NULL;
@@ -63,7 +63,7 @@ Weight *WEIGHT(uint n, uint m, uint wm_n, uint wm_m){
 void WEIGHT_FREE(Weight **we){
     uint i, size = ((*we)->n)*((*we)->m);
     for(i=0; i<size; i++)
-        MATRIX_FREE(WEIGHT_GETMATRIX1(*we, i));
+        MATRIX_FREE(WEIGHT_GETMATRIX1P(*we, i));
     free((*we)->matrix);
     free(*we);
     *we = NULL;

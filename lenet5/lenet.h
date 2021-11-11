@@ -47,8 +47,8 @@ extern void FEATURES_INITIAL(Feature **features);
 extern void activation_forward(Feature *output, Array *bias, number (*action)(number));
 extern void convolute_forward(Matrix *input, Matrix *weight, Matrix *output );
 extern void convolution_forward(Feature **input, LeNet lenet);
-extern void subsampling_forward(Feature *input);
-extern void dotproduct_forward(Feature *input, LeNet lenet);
+extern void subsampling_forward(Feature **input);
+extern void dotproduct_forward(Feature **input, LeNet lenet);
 
 /* ----- BACKWARD ----- */
 extern void activation_backward(Feature *output, number (*action)(number));
