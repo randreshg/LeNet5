@@ -28,15 +28,13 @@ Edited by: Rafael Herrera /2021
 #define MAX_FILENAME 256
 #define MAX_NUM_OF_IMAGES 1
 
-float test_image[NUM_TEST][IMG_SIZE];
-uint8 test_label[NUM_TEST];
 
 extern void FlipLong(unsigned char * ptr);
 extern void read_mnist_char(char *file_path, int num_data, int len_info, int arr_n, unsigned char data_char[][arr_n], int info_arr[]);
 extern void image_char2float(int num_data, unsigned char data_image_char[][IMG_SIZE], float data_image[][IMG_SIZE]);
 extern void label_char2char(int num_data, unsigned char data_label_char[][1], unsigned char data_label[]);
 extern void load_mnist(float train_image[NUM_TRAIN][IMG_SIZE], float test_image[NUM_TEST][IMG_SIZE], unsigned char train_label[NUM_TRAIN], unsigned char test_label[NUM_TEST]);
-extern void load_testData(float test_image[NUM_TEST][IMG_SIZE], unsigned char test_label[NUM_TEST]);
+extern void load_testData(unsigned char test_image[NUM_TEST][IMG_SIZE], unsigned char test_label[NUM_TEST]);
 extern void load_trainingData(float train_image[NUM_TRAIN][IMG_SIZE], unsigned char train_label[NUM_TRAIN]);
 extern void print_mnist_pixel(float data_image[][IMG_SIZE], int num_data);
 extern void print_mnist_label(int data_label[], int num_data, int train_label[NUM_TRAIN], int test_label[NUM_TEST]);

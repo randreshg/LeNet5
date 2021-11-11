@@ -52,6 +52,8 @@ int main()
     LENET_INITIAL(lenet);
     //Process starts
     clock_t start = clock();
+    float test_image[NUM_TEST][IMG_SIZE];
+    uint8 test_label[NUM_TEST];
     uint rightPredictions = testing(lenet, test_image, test_label, 1);
     //printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
     //Process ends

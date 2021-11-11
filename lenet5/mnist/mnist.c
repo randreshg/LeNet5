@@ -70,13 +70,13 @@ void load_mnist(float train_image[NUM_TRAIN][IMG_SIZE], float test_image[NUM_TES
     load_trainingData(train_image, train_label);
 }
 
-void load_testData(float test_image[NUM_TEST][IMG_SIZE], unsigned char test_label[NUM_TEST])
+void load_testData(unsigned char test_image[NUM_TEST][IMG_SIZE], unsigned char test_label[NUM_TEST])
 {
     //Test
-    unsigned char test_image_char[NUM_TEST][IMG_SIZE], test_label_char[NUM_TEST][1];
+    unsigned char test_label_char[NUM_TEST][1];//, test_image_char[NUM_TEST][IMG_SIZE];
     int info_label[LEN_INFO_LABEL], info_image[LEN_INFO_IMAGE];
-    read_mnist_char(TEST_IMAGE, NUM_TEST, LEN_INFO_IMAGE, IMG_SIZE, test_image_char, info_image);
-    image_char2float(NUM_TEST, test_image_char, test_image);
+    read_mnist_char(TEST_IMAGE, NUM_TEST, LEN_INFO_IMAGE, IMG_SIZE, test_image, info_image);
+    //image_char2float(NUM_TEST, test_image_char, test_image);
     read_mnist_char(TEST_LABEL, NUM_TEST, LEN_INFO_LABEL, 1, test_label_char, info_label);
     label_char2char(NUM_TEST, test_label_char, test_label);
 }
