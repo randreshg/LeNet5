@@ -10,31 +10,35 @@ LeNet *LENET(const uint n, const uint m, const uint wm_n, const uint wm_m){
 }
 
 // ----- Destructor ----- //
-void freeLenet(LeNet **lenet){
+void freeLenet(LeNet ***lenet){
+    LeNet **aux = *lenet;
     for(int i=0; i<4; i++){
-        WEIGHT_FREE(&(lenet[i]->weight));
-        ARRAY_FREE(&(lenet[i]->bias));
-        free(lenet[i]);
+        WEIGHT_FREE(&(aux[i]->weight));
+        ARRAY_FREE(&(aux[i]->bias));
+        free(aux[i]);
     }
+    free(aux);
 }
 
-void freeFeatures(Feature **features){
+void freeFeatures(Feature ***features){
+    Feature **aux = *features;
     for(int i=0; i<LAYERS+1; i++)
-        FEATURE_FREE(features+i);
+        FEATURE_FREE(aux+i);
+    free(aux);
 }
 
 // ----- Others ----- //
 uint8 predict(LeNet **lenet, uint8 *input, uint8 count)
 {
-    //Malloc features
-    Feature **features = malloc((LAYERS+1)*sizeof(Feature *));;
-    FEATURES_INITIAL(features);
+    //Features initial values
+    Feature **features = FEATURES_INITIAL();
     //Load input
     image_char2float(input, FEATURE_GETMATRIX(*features, 0)->p);
     //Forward propagation
     forwardPropagation(lenet, features);
     uint8 result = getResult(features[6], count);
-    freeFeatures(features);
+    //Free features
+    freeFeatures(&features);
     return result;
 }
 
@@ -62,13 +66,14 @@ void forwardPropagation(LeNet **lenet, Feature **features){
     //printf("OK \n");
 }
 
-void backwardPropagation(LeNet *lenet, Feature *features){
-    // convolution_backward(features, *lenet);
-    // subsampling_backward(features+1);
-    // convolution_backward(features+2, *lenet);
+void backwardPropagation(LeNet **lenet, Feature **features, Feature **gradientFeatures, LeNet **gradientLenet){
+    convolution_backward(features[6], *lenet[3], gradientFeatures+6, gradientLenet[3]);
+    subsampling_backward(features[5], gradientFeatures+5);
+    convolution_backward(features[4], *lenet[2], gradientFeatures+4, gradientLenet[2]);
+    subsampling_backward(features[3], gradientFeatures+3);
     // subsampling_backward(features+3);
-    // convolution_backward(features+4, *lenet);
-    // dotproduct_backward(features+5, *lenet);
+    // convolution_backward(features+2, *lenet);
+    // dotproduct_backward(features+1, *lenet);
 }
 
 // ----- Initial values ----- //
@@ -87,15 +92,18 @@ void initialValues(LeNet *lenet){
     }
 }
 
-void LENET_INITIAL(LeNet **lenet){
+LeNet **LENET_INITIAL(){
+    LeNet **lenet = malloc(4*sizeof(LeNet *));
     srand((unsigned int)time(NULL));
     lenet[0] = LENET(INPUT, LAYER1, LENGTH_KERNEL, LENGTH_KERNEL);
     lenet[1] = LENET(LAYER2, LAYER3, LENGTH_KERNEL, LENGTH_KERNEL);
     lenet[2] = LENET(LAYER4, LAYER5, LENGTH_KERNEL, LENGTH_KERNEL);
     lenet[3] = LENET(1, 1, LAYER5*LENGTH_FEATURE5*LENGTH_FEATURE5, OUTPUT);
+    return lenet;
 }
 
-void FEATURES_INITIAL(Feature **features){
+Feature **FEATURES_INITIAL(){
+    Feature **features = malloc(7*sizeof(LeNet *));
     features[0] = FEATURE(INPUT, LENGTH_FEATURE0, LENGTH_FEATURE0);
     features[1] = FEATURE(LAYER1, LENGTH_FEATURE1, LENGTH_FEATURE1);
     features[2] = FEATURE(LAYER2, LENGTH_FEATURE2, LENGTH_FEATURE2);
@@ -103,4 +111,5 @@ void FEATURES_INITIAL(Feature **features){
     features[4] = FEATURE(LAYER4, LENGTH_FEATURE4, LENGTH_FEATURE4);
     features[5] = FEATURE(LAYER5, LENGTH_FEATURE5, LENGTH_FEATURE5);
     features[6] = FEATURE(1, 1, OUTPUT);
+    return features;
 }

@@ -12,8 +12,8 @@ Edited by: Rafael Herrera /2021
 #include <string.h>
 
 // set appropriate path for data
-#define TRAIN_IMAGE "data/train-images.idx3-ubyte"
-#define TRAIN_LABEL "data/train-labels.idx1-ubyte"
+#define TRAIN_IMAGE "data/train-images-idx3-ubyte"
+#define TRAIN_LABEL "data/train-labels-idx1-ubyte"
 #define TEST_IMAGE "data/t10k-images-idx3-ubyte"
 #define TEST_LABEL "data/t10k-labels-idx1-ubyte"
 

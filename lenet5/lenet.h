@@ -29,19 +29,19 @@ typedef struct
 
 /* ----- CONSTRUCTOR ----- */
 extern LeNet *LENET(uint n, uint m, uint wm_n, uint wm_m);
-extern void freeLenet(LeNet **lenet);
-
+extern void freeLenet(LeNet ***lenet);
+extern void freeFeatures(Feature ***features);
 /* ----- FUNCTIONS ----- */
 //Others
 extern uint8 predict(LeNet **lenet, uint8 *input, uint8 count);
 extern uint8 getResult(Feature *features, uint8 count);
 //Propagation
 extern void forwardPropagation(LeNet **lenet, Feature **features);
-extern void backwardPropagation(LeNet *lenet, Feature *features);
+extern void backwardPropagation(LeNet **lenet, Feature **features, Feature **gradientFeatures, LeNet **gradientLenet);
 //Initial values
 extern void initialValues(LeNet *lenet);
-extern void LENET_INITIAL(LeNet **lenet);
-extern void FEATURES_INITIAL(Feature **features);
+extern LeNet **LENET_INITIAL();
+extern Feature **FEATURES_INITIAL();
 
 /* ----- FORWARD ----- */
 extern void activation_forward(Feature *output, Array *bias, number (*action)(number));
@@ -58,7 +58,7 @@ extern void subsampling_backward(Feature *input, Feature **inputGradient);
 extern void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *gradientLenet);
 
 /* ----- OTHERS ----- */
-extern void softMax(Feature *input, Array *target, Feature *gradient);
+extern void softMax(Feature *input, uint8 target, Feature *featureGradient);
 extern number costFunction(Feature *input, uint8 target);
 extern number ReLU(number x);
 extern number ReLU_GRAD(number x);

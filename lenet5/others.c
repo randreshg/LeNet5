@@ -9,9 +9,9 @@ number ReLU_GRAD(number y){
     return y > 0;
 }
 
-void softMax(Feature *input, Array *target, Feature *featureGradient){
+void softMax(Feature *input, uint8 target, Feature *featureGradient){
     //Aux variables
-    uint om;
+    uint8 om;
     number den = 0.0;
     Matrix *inputMatrix = FEATURE_GETMATRIX(input, 0);
     Matrix *gradientMatrix = FEATURE_GETMATRIX(featureGradient, 0);
@@ -24,7 +24,7 @@ void softMax(Feature *input, Array *target, Feature *featureGradient){
         //Softmax calculation
         ARRAY_VALUE(inputMatrix, om) = MATRIX_VALUE(inputMatrix, 0, om)/den;
         //Softmax gradient
-        MATRIX_VALUE(gradientMatrix, 0, om) = MATRIX_VALUE(inputMatrix, 0, om) - ARRAY_VALUE(target, om);
+        MATRIX_VALUE(gradientMatrix, 0, om) = (om==target ? (MATRIX_VALUE(inputMatrix, 0, om)-1) : (MATRIX_VALUE(inputMatrix, 0, om)));
     }
 }
 

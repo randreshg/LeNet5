@@ -38,33 +38,63 @@ void training(){
     static uint8 train_image[NUM_TRAIN][IMG_SIZE];
     static uint8 train_label[NUM_TRAIN];
     load_trainingData(train_image, train_label);
+    printf("TEST: %d \n", train_label[10]);
+}
+
+void trainBatch(LeNet **lenet, uint8 *input[IMG_SIZE], uint8 *labels, uint batchSize)
+{
+    //Aux variables
+    uint i;
+    number cost;
+    Feature **features;
+    Feature **featuresGradient = FEATURES_INITIAL();
+    LeNet **gradientLenet = LENET_INITIAL();
+    for (i = 0; i < batchSize; i++)
+    {
+        //Malloc features
+        features = FEATURES_INITIAL();
+        //Load input
+        image_char2float(input[i], FEATURE_GETMATRIX(*features, 0)->p);
+        //Forward propagaton
+        forwardPropagation(lenet, features);
+        //Cost function
+        cost = costFunction(features[6], labels[i]);
+        //softMax
+        softMax(features[6], labels[i], featuresGradient[6]);
+        //Backward
+        //backward(lenet, &deltas, &errors, &features, relugrad);
+        //Update weights
+
+        //Free memory
+        freeFeatures(&features);
+    }
+    
+    // double k = ALPHA / batchSize;
+    // FOREACH(i, GETCOUNT(LeNet5))
+    //     ((double *)lenet)[i] += k * buffer[i];
 }
 
 int main()
 {
-    bool training = false;
-    if(training){
-        
-    }
+    bool train = false;
+    if(train)
+        training();
     printf("OK \n");
-    //Read testing data
-    
-    //load_trainingData(test_image, test_label);
     //Load test data
     static uint8 test_image[NUM_TEST][IMG_SIZE]; 
     static uint8 test_label[NUM_TEST];
     load_testData(test_image, test_label);
     //printf("-%u \n", *test_label);
     //Malloc 
-    LeNet **lenet = malloc(4*sizeof(LeNet *));;
-    LENET_INITIAL(lenet);
+    LeNet **lenet = LENET_INITIAL();
     //Process starts
     clock_t start = clock();
-    uint rightPredictions = testing(lenet, test_image, test_label, 1000);
+    uint rightPredictions = testing(lenet, test_image, test_label, 1);
     //Process ends
-    printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
+    //printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
     printf("Time: %u\n", (unsigned)(clock() - start));
-    freeLenet(lenet);
+    //Free
+    freeLenet(&lenet);
     
     return 0;
 }
