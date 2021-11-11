@@ -1,5 +1,6 @@
 #include "lenet.h"
 
+// ----- Constructor ----- //
 LeNet *LENET(const uint n, const uint m, const uint wm_n, const uint wm_m){
     LeNet *le = (LeNet *)malloc(sizeof(LeNet));
     le->weight = WEIGHT(n, m, wm_n, wm_m);
@@ -8,6 +9,7 @@ LeNet *LENET(const uint n, const uint m, const uint wm_n, const uint wm_m){
     return le;
 }
 
+// ----- Destructor ----- //
 void freeLenet(LeNet **lenet){
     for(int i=0; i<4; i++){
         WEIGHT_FREE(&(lenet[i]->weight));
@@ -21,6 +23,7 @@ void freeFeatures(Feature **features){
         FEATURE_FREE(features+i);
 }
 
+// ----- Others ----- //
 uint8 predict(LeNet **lenet, uint8 *input, uint8 count)
 {
     //Malloc features
@@ -30,9 +33,22 @@ uint8 predict(LeNet **lenet, uint8 *input, uint8 count)
     image_char2float(input, FEATURE_GETMATRIX(*features, 0)->p);
     //Forward propagation
     forwardPropagation(lenet, features);
-    //uint8 result = get_result(features[6], count);
+    uint8 result = getResult(features[6], count);
     freeFeatures(features);
-    return 1;
+    return result;
+}
+
+uint8 getResult(Feature *features, uint8 count){
+    uint8 om, result=-1, max = -1;
+    Matrix *output = FEATURE_GETMATRIX(features, 0);
+    for(om=0; om<output->m;om++){
+        //printf("--%u: %f \n", om, MATRIX_VALUE1(output, om));
+        if(MATRIX_VALUE1(output, om) > max){
+            max = MATRIX_VALUE1(output, om);
+            result = om;
+        }
+    }
+    return result;
 }
 
 // ----- Propagation ----- //
@@ -43,7 +59,7 @@ void forwardPropagation(LeNet **lenet, Feature **features){
     subsampling_forward(features+3);
     convolution_forward(features+4, *lenet[2]);
     dotproduct_forward(features+5, *lenet[3]);
-    printf("OK \n");
+    //printf("OK \n");
 }
 
 void backwardPropagation(LeNet *lenet, Feature *features){
@@ -65,7 +81,7 @@ void initialValues(LeNet *lenet){
             matrix = WEIGHT_GETMATRIX(lenet->weight, n, m);
             matrixSize = MATRIX_SIZE(matrix);
             for(i=0; i<matrixSize; i++){
-                MATRIX_VALUE1(matrix, i) = f32Rand(10);
+                MATRIX_VALUE1(matrix, i) = f32Rand(1.0);
             }
         }
     }

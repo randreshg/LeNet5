@@ -53,13 +53,13 @@ extern void dotproduct_forward(Feature **input, LeNet lenet);
 /* ----- BACKWARD ----- */
 extern void activation_backward(Feature *output, number (*action)(number));
 extern void convolute_backward(Matrix *input, Matrix *weight, Matrix *output);
-extern void convolution_backward(Feature *input, LeNet lenet, Feature *inputGradient, LeNet gradientLenet);
-extern void subsampling_backward(Feature *input, Feature *inputGradient);
-extern void dotproduct_backward(Feature *input, LeNet lenet, Feature *inputGradient, LeNet gradientLenet);
+extern void convolution_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *gradientLenet);
+extern void subsampling_backward(Feature *input, Feature **inputGradient);
+extern void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *gradientLenet);
 
 /* ----- OTHERS ----- */
 extern void softMax(Feature *input, Array *target, Feature *gradient);
-extern number costFunction(Feature *input, Array *target);
+extern number costFunction(Feature *input, uint8 target);
 extern number ReLU(number x);
 extern number ReLU_GRAD(number x);
 #define f32Rand(a) ((float)rand()/(float)(RAND_MAX)) * a;

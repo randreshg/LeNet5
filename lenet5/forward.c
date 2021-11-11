@@ -45,8 +45,8 @@ void subsampling_forward(Feature **input){
     //Aux variables
     Matrix *inputMatrix, *outputMatrix;
     unsigned int o, on, om, ln, lm, max, aux_n, aux_m, aux;
-    const uint ln_length = FEATURE_GETMATRIX(*input, 0)->n / FEATURE_GETMATRIX(output, 0)->n;
-    const uint lm_length = FEATURE_GETMATRIX(*input, 0)->m / FEATURE_GETMATRIX(output, 0)->m;
+    const uint ln_length = FEATURE_GETMATRIX(*input, 0)->n / FEATURE_GETMATRIX(output, 0)->n,
+               lm_length = FEATURE_GETMATRIX(*input, 0)->m / FEATURE_GETMATRIX(output, 0)->m;
     //Ouput array loop
     for(o = 0; o < output->n; o++){
         inputMatrix = FEATURE_GETMATRIX(*input, o);

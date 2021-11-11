@@ -28,15 +28,10 @@ void softMax(Feature *input, Array *target, Feature *featureGradient){
     }
 }
 
-number costFunction(Feature *input, Array *target){
+number costFunction(Feature *input, uint8 target){
     //Aux variables
-    uint om;
-    number cost = 0;
     Matrix *inputMatrix = FEATURE_GETMATRIX(input, 0);
-    for(om =0; om<inputMatrix->m; om++){
-        cost = ARRAY_VALUE(target, om)*log(MATRIX_VALUE(inputMatrix, 0, om));
-    }
-    return (-cost/inputMatrix->m);
+    return (-log(MATRIX_VALUE(FEATURE_GETMATRIX(input, 0), 0, target))/inputMatrix->m);
 }
 
 
