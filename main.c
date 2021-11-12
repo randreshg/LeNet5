@@ -21,8 +21,8 @@ void loadInput(uint8 input[][IMG_SIZE], Feature *features)
     uint in, im;
     number mean = 0, std = 0, val;
     //Calculate standart deviation and mean
-    for(in=0; in<IMG_ROWS; in++)
-    for(im=0; im<IMG_COLS; im++){
+    for(in = 0; in<IMG_ROWS; in++)
+    for(im = 0; im<IMG_COLS; im++) {
         val = input[in][im];
         mean += val;
         std += val*val;
@@ -89,7 +89,7 @@ int main()
     LeNet **lenet = LENET_INITIAL();
     setInitialValues(lenet);
     //Training
-    bool train = true;
+    bool train = false;
     if(train)
         training(lenet);
     //printf("OK \n");
@@ -100,9 +100,9 @@ int main()
 
     //Process starts
     clock_t start = clock();
-    //uint rightPredictions = testing(lenet, test_image, test_label, 100);
+    uint rightPredictions = testing(lenet, test_image, test_label, 100);
     //Process ends
-    //printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
+    printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
     printf("Time: %u\n", (unsigned)(clock() - start));
     //Free
     freeLenet(&lenet);

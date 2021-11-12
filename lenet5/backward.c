@@ -85,8 +85,8 @@ void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, L
     //Aux variables
     uint wn1, wn2, wm, wn1_aux, wn2_aux;
     Matrix *auxMatrix;
-    Matrix *weightMatrix = WEIGHT_GETMATRIX(lenet.weight, 0, 0);
-    Matrix *weightGradientMatrix = WEIGHT_GETMATRIX(gradientLenet->weight, 0, 0);
+    Matrix *weightMatrix = WEIGHT_GETMATRIX1(lenet.weight, 0);
+    Matrix *weightGradientMatrix = WEIGHT_GETMATRIX1(gradientLenet->weight, 0);
     Matrix *inputGradientMatrix = FEATURE_GETMATRIX(*inputGradient, 0);
     //Constants
     const uint wn1_length = outputGradient->n, wn2_length = (weightMatrix->n)/wn1_length;
@@ -107,8 +107,9 @@ void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, L
     for(wm = 0; wm < (gradientLenet->bias)->n; wm++)
         ARRAY_VALUE(gradientLenet->bias, wm) += MATRIX_VALUE1(inputGradientMatrix, wm);
     //Update weights
+    auxMatrix = FEATURE_GETMATRIX(input, 0);
     for(wn1 = 0; wn1 < wn1_length; wn1++){
-        auxMatrix = FEATURE_GETMATRIX(input, wn1);
+        printf("OK: %d \n", wn1);
         wn1_aux = wn1*wn2_length;
         for(wn2 = 0; wn2 < wn2_length; wn2++){
             wn2_aux = wn1_aux+wn2;
