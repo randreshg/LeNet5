@@ -20,7 +20,7 @@ void loadInput(uint8 input[][IMG_SIZE], Feature *features)
     Matrix *inputMatrix = FEATURE_GETMATRIX(features, 0);
     uint in, im;
     number mean = 0, std = 0, val;
-    //Calculate standar deviation and mean
+    //Calculate standart deviation and mean
     for(in=0; in<IMG_ROWS; in++)
     for(im=0; im<IMG_COLS; im++){
         val = input[in][im];
@@ -29,7 +29,7 @@ void loadInput(uint8 input[][IMG_SIZE], Feature *features)
     }
     mean = mean/IMG_SIZE;
     std = sqrt(std/IMG_SIZE - mean*mean);
-    //Normalize data
+    //Normalize data and add padding
     for(in=0; in<IMG_ROWS; in++)
     for(im=0; im<IMG_COLS; im++)
         MATRIX_VALUE(inputMatrix, in+2, im+2) = (input[in][im]-mean)/std;
@@ -49,16 +49,16 @@ void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, uint batc
         features = FEATURES_INITIAL();
         //Load input
         loadInput(input, *features);
-        //Forward propagaton
+        //Forward propagation
         forwardPropagation(lenet, features);
-        //softMax
+        //SoftMax
         softMax(features[6], labels[i], featuresGradient[6]);
         //Cost function
         cost = costFunction(featuresGradient[6], labels[i]);
         printf("Cost: %f \n", cost);
         
         //Backward
-        //backward(lenet, &deltas, &errors, &features, relugrad);
+        backwardPropagation(lenet, features, featuresGradient, gradientLenet);
         //Update weights
 
         //Free memory
@@ -87,11 +87,12 @@ int main()
 {
     //Malloc 
     LeNet **lenet = LENET_INITIAL();
+    setInitialValues(lenet);
     //Training
     bool train = true;
     if(train)
         training(lenet);
-    printf("OK \n");
+    //printf("OK \n");
     //Testing
     static uint8 test_image[NUM_TEST][IMG_SIZE]; 
     static uint8 test_label[NUM_TEST];
@@ -99,7 +100,7 @@ int main()
 
     //Process starts
     clock_t start = clock();
-    uint rightPredictions = testing(lenet, test_image, test_label, 1);
+    //uint rightPredictions = testing(lenet, test_image, test_label, 100);
     //Process ends
     //printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
     printf("Time: %u\n", (unsigned)(clock() - start));

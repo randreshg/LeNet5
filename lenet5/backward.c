@@ -117,4 +117,5 @@ void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, L
                 MATRIX_VALUE(weightGradientMatrix, wn2_aux, wm) += MATRIX_VALUE1(auxMatrix, wn2)*MATRIX_VALUE1(inputGradientMatrix, wm);
         }
     }
+    printf("OK\n");
 }
