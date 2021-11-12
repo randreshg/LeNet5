@@ -17,7 +17,9 @@ Edited by: Rafael Herrera /2021
 #define TEST_IMAGE "data/t10k-images-idx3-ubyte"
 #define TEST_LABEL "data/t10k-labels-idx1-ubyte"
 
-#define IMG_SIZE 784 // 28*28
+#define IMG_ROWS 28  // 28
+#define IMG_COLS 28  // 28
+#define IMG_SIZE 784 // IMG_ROWS*IMG_COLS
 #define NUM_TRAIN 60000
 #define NUM_TEST 10000
 #define LEN_INFO_IMAGE 4

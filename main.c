@@ -1,25 +1,6 @@
 //gcc -o main main.c lenet5/lenet.c lenet5/backward.c lenet5/forward.c lenet5/others.c
 #include "lenet5/lenet.h"
 
-
-int save(LeNet *lenet, char filename[])
-{
-    FILE *fp = fopen(filename, "wb");
-    if (!fp) return 1;
-    fwrite(lenet, sizeof(LeNet), 1, fp);
-    fclose(fp);
-    return 0;
-}
-
-int load(LeNet *lenet, char filename[])
-{
-    FILE *fp = fopen(filename, "rb");
-    if (!fp) return 1;
-    fread(lenet, sizeof(LeNet), 1, fp);
-    fclose(fp);
-    return 0;
-}
-
 uint testing(LeNet **lenet, uint8 test_image[][IMG_SIZE], uint8 *test_label, uint total_size)
 {
     uint rightPredictions=0, percent=0, i;
@@ -31,6 +12,27 @@ uint testing(LeNet **lenet, uint8 test_image[][IMG_SIZE], uint8 *test_label, uin
             printf("test:%2d%%\n", percent = i*100/total_size);
     }
     return rightPredictions;
+}
+
+void loadInput(uint8 input[][IMG_SIZE], Feature *features)
+{
+    //Aux variables
+    Matrix *inputMatrix = FEATURE_GETMATRIX(features, 0);
+    uint in, im;
+    number mean = 0, std = 0, val;
+    //Calculate standar deviation and mean
+    for(in=0; in<IMG_ROWS; in++)
+    for(im=0; im<IMG_COLS; im++){
+        val = input[in][im];
+        mean += val;
+        std += val*val;
+    }
+    mean = mean/IMG_SIZE;
+    std = sqrt(std/IMG_SIZE - mean*mean);
+    //Normalize data
+    for(in=0; in<IMG_ROWS; in++)
+    for(im=0; im<IMG_COLS; im++)
+        MATRIX_VALUE(inputMatrix, in+2, im+2) = (input[in][im]-mean)/std;
 }
 
 void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, uint batchSize)
@@ -46,7 +48,7 @@ void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, uint batc
         //Malloc features
         features = FEATURES_INITIAL();
         //Load input
-        image_char2float(input[i], FEATURE_GETMATRIX(*features, 0)->p);
+        loadInput(input, *features);
         //Forward propagaton
         forwardPropagation(lenet, features);
         //softMax
