@@ -18,7 +18,6 @@ void convolute_forward(Matrix *input, Matrix *weight, Matrix *output ){
     //Output loop
     for(on = 0; on < output->n; on++)
     for(om = 0; om < output->m; om++){
-        MATRIX_VALUE(output, on, om) = 0;
         //Weight matrix loop - KERNEL
         for(wn = 0; wn < weight->n; wn++)
         for(wm = 0; wm < weight->m; wm++)
@@ -44,7 +43,8 @@ void subsampling_forward(Feature **input){
     Feature *output = *(input + 1);
     //Aux variables
     Matrix *inputMatrix, *outputMatrix;
-    unsigned int o, on, om, ln, lm, max, aux_n, aux_m, aux;
+    uint o, on, om, ln, lm, aux_n, aux_m;
+    number max, aux;
     const uint ln_length = FEATURE_GETMATRIX(*input, 0)->n / FEATURE_GETMATRIX(output, 0)->n,
                lm_length = FEATURE_GETMATRIX(*input, 0)->m / FEATURE_GETMATRIX(output, 0)->m;
     //Ouput array loop

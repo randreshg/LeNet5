@@ -52,6 +52,7 @@ void loadInput(uint8 *input, Feature *features)
 uint8 predict(LeNet **lenet, uint8 *input, uint8 count)
 {
     //Features initial values
+    //printf("Predicting... \n");
     Feature **features = FEATURES_INITIAL();
     //Load input
     loadInput(input, *features);
@@ -68,7 +69,6 @@ uint8 getResult(Feature *features, uint8 count){
     number max = -1;
     Matrix *output = FEATURE_GETMATRIX(features, 0);
     for(om=0; om<output->m;om++){
-        printf("%f, ", MATRIX_VALUE1(output, om));
         if(MATRIX_VALUE1(output, om) > max){
             max = MATRIX_VALUE1(output, om);
             result = om;
@@ -121,10 +121,6 @@ Feature **FEATURES_INITIAL(){
 
 void setInitialValues(LeNet **lenet){
     srand((unsigned int)time(NULL));
-    randInitialValues(lenet[0]);
-    randInitialValues(lenet[1]);
-    randInitialValues(lenet[2]);
-    randInitialValues(lenet[3]);
     initialValues(lenet[0],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (INPUT + LAYER1))));
     initialValues(lenet[1],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (LAYER2 + LAYER3))));
     initialValues(lenet[2],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (LAYER4 + LAYER5))));
@@ -140,7 +136,7 @@ void randInitialValues(LeNet *lenet){
             matrix = WEIGHT_GETMATRIX(lenet->weight, n, m);
             matrixSize = MATRIX_SIZE(matrix);
             for(i=0; i<matrixSize; i++){
-                MATRIX_VALUE1(matrix, i) = f32Rand(0.0001);
+                MATRIX_VALUE1(matrix, i) = f32Rand(1);
             }
         }
     }
@@ -149,7 +145,7 @@ void randInitialValues(LeNet *lenet){
 void initialValues(LeNet *lenet, const number value){
     uint n, m, i, matrixSize;
     Matrix *matrix;
-    
+    randInitialValues(lenet);
     for(n=0; n<lenet->weight->n; n++){
         for(m=0; m<lenet->weight->m; m++){
             matrix = WEIGHT_GETMATRIX(lenet->weight, n, m);

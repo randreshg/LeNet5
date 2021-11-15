@@ -25,7 +25,7 @@ void softMax(Feature *input, uint8 target, Feature *featureGradient){
     for(om = 0; om < inputMatrix->m; om++){
         //Softmax calculation
         ARRAY_VALUE(gradientMatrix, om) = MATRIX_VALUE1(gradientMatrix, om)/den;
-        printf("%f \n", MATRIX_VALUE1(gradientMatrix, om));
+        //printf("%f \n", MATRIX_VALUE1(gradientMatrix, om));
         //Softmax gradient
         if(om==target)
             MATRIX_VALUE1(gradientMatrix, om) = MATRIX_VALUE1(gradientMatrix,om)-1;
