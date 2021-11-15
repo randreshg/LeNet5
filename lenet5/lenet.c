@@ -90,8 +90,8 @@ void forwardPropagation(LeNet **lenet, Feature **features){
 
 void backwardPropagation(LeNet **lenet, Feature **features, Feature **gradientFeatures, LeNet **gradientLenet){
     dotproduct_backward(features[6], *lenet[3], gradientFeatures+6, gradientLenet[3]);
-    subsampling_backward(features[5], gradientFeatures+5);
-    // convolution_backward(features[4], *lenet[2], gradientFeatures+4, gradientLenet[2]);
+    convolution_backward(features[5], *lenet[2], gradientFeatures+5, gradientLenet[2]);
+    subsampling_backward(features[4], gradientFeatures+4);
     // subsampling_backward(features[3], gradientFeatures+3);
     // convolution_backward(features[2], *lenet[1], gradientFeatures+2, gradientLenet[1]);
     // dotproduct_backward(features[1], *lenet[0], gradientFeatures+1, gradientLenet[0]);

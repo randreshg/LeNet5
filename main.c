@@ -16,7 +16,6 @@ uint testing(LeNet **lenet, uint8 test_image[][IMG_SIZE], uint8 *test_label, uin
     return rightPredictions;
 }
 
-
 void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, uint batchSize)
 {
     //Aux variables
@@ -30,13 +29,13 @@ void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, uint batc
         //Malloc features
         features = FEATURES_INITIAL();
         //Load input
-        loadInput(input, *features);
+        loadInput(input[i], *features);
         //Forward propagation
         forwardPropagation(lenet, features);
         //SoftMax
         softMax(features[6], labels[i], featuresGradient[6]);
         //Backward
-        //backwardPropagation(lenet, features, featuresGradient, gradientLenet);
+        backwardPropagation(lenet, features, featuresGradient, gradientLenet);
         //Update weights
 
         //Free memory
@@ -68,7 +67,7 @@ int main()
     LeNet **lenet = LENET_INITIAL();
     setInitialValues(lenet);
     //Training
-    bool train = false;
+    bool train = true;
     if(train)
         training(lenet);
     //printf("OK \n");
@@ -79,9 +78,9 @@ int main()
 
     //Process starts
     clock_t start = clock();
-    uint rightPredictions = testing(lenet, test_image, test_label, 10);
+    //uint rightPredictions = testing(lenet, test_image, test_label, 10);
     //Process ends
-    printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
+    //printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
     printf("Time: %u\n", (unsigned)(clock() - start));
     //Free
     freeLenet(&lenet);
