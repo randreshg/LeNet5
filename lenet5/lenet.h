@@ -33,6 +33,7 @@ extern void freeLenet(LeNet ***lenet);
 extern void freeFeatures(Feature ***features);
 /* ----- FUNCTIONS ----- */
 //Others
+extern void loadInput(uint8 *input, Feature *features);
 extern uint8 predict(LeNet **lenet, uint8 *input, uint8 count);
 extern uint8 getResult(Feature *features, uint8 count);
 //Propagation
@@ -64,6 +65,6 @@ extern void softMax(Feature *input, uint8 target, Feature *featureGradient);
 extern number costFunction(Feature *input, uint8 target);
 extern number ReLU(number x);
 extern number ReLU_GRAD(number x);
-#define f32Rand(a) (((float)rand()/(float)(RAND_MAX)) * a);
+#define f32Rand(a) (((float)rand()/(float)(RAND_MAX))*(2*a) - a);
 
 

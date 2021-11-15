@@ -5,7 +5,6 @@ LeNet *LENET(const uint n, const uint m, const uint wm_n, const uint wm_m){
     LeNet *le = (LeNet *)malloc(sizeof(LeNet));
     le->weight = WEIGHT(n, m, wm_n, wm_m);
     le->bias = ARRAY(m);
-    //initialValues(le);
     return le;
 }
 
@@ -18,22 +17,44 @@ void freeLenet(LeNet ***lenet){
         free(aux[i]);
     }
     free(aux);
+    aux = NULL;
 }
 
 void freeFeatures(Feature ***features){
     Feature **aux = *features;
     for(int i=0; i<LAYERS+1; i++)
-        FEATURE_FREE(aux+i);
+        FEATURE_FREE(&aux[i]);
     free(aux);
+    aux = NULL;
 }
 
 // ----- Others ----- //
+void loadInput(uint8 *input, Feature *features)
+{
+    //Aux variables
+    Matrix *inputMatrix = FEATURE_GETMATRIX(features, 0);
+    uint in, im;
+    number mean = 0, std = 0, val;
+    //Calculate standart deviation and mean
+    for(in = 0; in<IMG_SIZE; in++){
+        val = input[in];
+        mean += val;
+        std += val*val;
+    }
+    mean = mean/IMG_SIZE;
+    std = sqrt(std/IMG_SIZE - mean*mean);
+    //Normalize data and add padding
+    for(in=0; in<IMG_ROWS; in++)
+    for(im=0; im<IMG_COLS; im++)
+        MATRIX_VALUE(inputMatrix, in+2, im+2) = (input[in*IMG_COLS + im]-mean)/std;
+}
+
 uint8 predict(LeNet **lenet, uint8 *input, uint8 count)
 {
     //Features initial values
     Feature **features = FEATURES_INITIAL();
     //Load input
-    image_char2float(input, FEATURE_GETMATRIX(*features, 0)->p);
+    loadInput(input, *features);
     //Forward propagation
     forwardPropagation(lenet, features);
     uint8 result = getResult(features[6], count);
@@ -43,10 +64,11 @@ uint8 predict(LeNet **lenet, uint8 *input, uint8 count)
 }
 
 uint8 getResult(Feature *features, uint8 count){
-    uint8 om, result=-1, max = -1;
+    uint8 om, result=-1;
+    number max = -1;
     Matrix *output = FEATURE_GETMATRIX(features, 0);
     for(om=0; om<output->m;om++){
-        //printf("--%u: %f \n", om, MATRIX_VALUE1(output, om));
+        printf("%f, ", MATRIX_VALUE1(output, om));
         if(MATRIX_VALUE1(output, om) > max){
             max = MATRIX_VALUE1(output, om);
             result = om;
@@ -68,7 +90,7 @@ void forwardPropagation(LeNet **lenet, Feature **features){
 
 void backwardPropagation(LeNet **lenet, Feature **features, Feature **gradientFeatures, LeNet **gradientLenet){
     dotproduct_backward(features[6], *lenet[3], gradientFeatures+6, gradientLenet[3]);
-    // subsampling_backward(features[5], gradientFeatures+5);
+    subsampling_backward(features[5], gradientFeatures+5);
     // convolution_backward(features[4], *lenet[2], gradientFeatures+4, gradientLenet[2]);
     // subsampling_backward(features[3], gradientFeatures+3);
     // convolution_backward(features[2], *lenet[1], gradientFeatures+2, gradientLenet[1]);
@@ -118,7 +140,7 @@ void randInitialValues(LeNet *lenet){
             matrix = WEIGHT_GETMATRIX(lenet->weight, n, m);
             matrixSize = MATRIX_SIZE(matrix);
             for(i=0; i<matrixSize; i++){
-                MATRIX_VALUE1(matrix, i) = f32Rand(0.00001);
+                MATRIX_VALUE1(matrix, i) = f32Rand(0.0001);
             }
         }
     }

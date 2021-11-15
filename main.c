@@ -7,33 +7,16 @@ uint testing(LeNet **lenet, uint8 test_image[][IMG_SIZE], uint8 *test_label, uin
     uint8 prediction;
     for (i=0; i<total_size; i++){
         prediction = predict(lenet, test_image[i], 10);
+        printf("\nTARGET:%u - PREDICTION:%u\n", test_label[i], prediction);
+        printf("------------------\n");
         rightPredictions += (test_label[i] == prediction);
-        if (i * 100 / total_size > percent)
-            printf("test:%2d%%\n", percent = i*100/total_size);
+        // if (i * 100 / total_size > percent)
+        //     printf("test:%2d%%\n", percent = i*100/total_size);
     }
     return rightPredictions;
 }
 
-void loadInput(uint8 input[][IMG_SIZE], Feature *features)
-{
-    //Aux variables
-    Matrix *inputMatrix = FEATURE_GETMATRIX(features, 0);
-    uint in, im;
-    number mean = 0, std = 0, val;
-    //Calculate standart deviation and mean
-    for(in = 0; in<IMG_ROWS; in++)
-    for(im = 0; im<IMG_COLS; im++) {
-        val = input[in][im];
-        mean += val;
-        std += val*val;
-    }
-    mean = mean/IMG_SIZE;
-    std = sqrt(std/IMG_SIZE - mean*mean);
-    //Normalize data and add padding
-    for(in=0; in<IMG_ROWS; in++)
-    for(im=0; im<IMG_COLS; im++)
-        MATRIX_VALUE(inputMatrix, in+2, im+2) = (input[in][im]-mean)/std;
-}
+
 
 void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, uint batchSize)
 {
@@ -53,12 +36,8 @@ void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, uint batc
         forwardPropagation(lenet, features);
         //SoftMax
         softMax(features[6], labels[i], featuresGradient[6]);
-        //Cost function
-        cost = costFunction(featuresGradient[6], labels[i]);
-        printf("Cost: %f \n", cost);
-        
         //Backward
-        backwardPropagation(lenet, features, featuresGradient, gradientLenet);
+        //backwardPropagation(lenet, features, featuresGradient, gradientLenet);
         //Update weights
 
         //Free memory
@@ -83,6 +62,7 @@ void training(LeNet **lenet){
     //         printf("batchsize:%d\ttrain:%2d%%\n", batch_size, percent = i * 100 / total_size);
     // }
 }
+
 int main()
 {
     //Malloc 
@@ -100,7 +80,7 @@ int main()
 
     //Process starts
     clock_t start = clock();
-    uint rightPredictions = testing(lenet, test_image, test_label, 100);
+    uint rightPredictions = testing(lenet, test_image, test_label, 1);
     //Process ends
     printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
     printf("Time: %u\n", (unsigned)(clock() - start));

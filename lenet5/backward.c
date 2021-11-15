@@ -69,12 +69,14 @@ void subsampling_backward(Feature *input, Feature **inputGradient){
         for(om = 0; om < inputGradientMatrix->m; om++){
             //Subsampling
             max = -1, aux_n = ln_length*on, aux_m = lm_length*om;
-            for(ln = 0; ln < ln_length; ln++)
+            for(ln = 0; ln < ln_length; ln++){
                 for(lm = 0; lm < lm_length; lm++){
                     aux = MATRIX_VALUE(inputMatrix, (aux_n + ln), (aux_m + lm));
                     if(aux > max)
                         max = aux, maxLn = (aux_n + ln), maxLm = (aux_m + lm);
                 }
+            }
+            printf("OK: %d \n", o);
             MATRIX_VALUE(outputGradientMatrix, maxLn, maxLm) = MATRIX_VALUE(inputGradientMatrix, on, om);
         }
     }
@@ -109,7 +111,6 @@ void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, L
     //Update weights
     auxMatrix = FEATURE_GETMATRIX(input, 0);
     for(wn1 = 0; wn1 < wn1_length; wn1++){
-        printf("OK: %d \n", wn1);
         wn1_aux = wn1*wn2_length;
         for(wn2 = 0; wn2 < wn2_length; wn2++){
             wn2_aux = wn1_aux+wn2;
