@@ -9,19 +9,23 @@ LeNet *LENET(const uint n, const uint m, const uint wm_n, const uint wm_m){
 }
 
 void LENET_FREE(LeNet **lenet){
-    printf("Weight\n");
+    printf("-Weight %p\n", &((*lenet)->weight));
     WEIGHT_FREE(&((*lenet)->weight));
-    printf("Bias\n");
-    ARRAY_FREE(&((*lenet)->bias));
-    free(*lenet);
-    *lenet = NULL;
+    // printf("-Bias %p\n", (*lenet)->bias);
+    // ARRAY_FREE(&((*lenet)->bias));
+    // printf("-Pointer %p\n", *lenet);
+    // free(*lenet);
+    // *lenet = NULL;
 }
 // ----- Destructors ----- //
 void freeLenet(LeNet ***lenet){
-    for(int i=0; i<4; i++)
-        LENET_FREE(lenet[i]);
-    free(*lenet);
-    *lenet = NULL;
+    LeNet **aux = *lenet;
+    for(int i=0; i<4; i++){
+        printf("ok\n");
+        LENET_FREE(aux+i);
+    }
+    free(aux);
+    aux = NULL;
 }
 
 void freeFeatures(Feature ***features){
@@ -38,18 +42,18 @@ void updateParameters(LeNet **gradientLenet, LeNet **lenet, const number factor)
     
 }
 
-void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, uint batchSize)
+void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uint batchSize)
 {
     //Aux variables
-    uint i;
     const number alpha = (float) LEARNING_RATE / batchSize;
+    uint i;
+    LeNet **lenetGradient;
     Feature **features, **featuresGradient;
-    LeNet **gradientLenet;
     for (i = 0; i < batchSize; i++) {
         //Malloc memory
+        lenetGradient = LENET_INITIAL();
         features = FEATURES_INITIAL();
         featuresGradient = FEATURES_INITIAL();
-        gradientLenet = LENET_INITIAL();
         //Load input
         loadInput(input[i], *features);
         //Forward propagation
@@ -57,17 +61,20 @@ void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, uint batc
         //SoftMax
         softMax(features[6], labels[i], featuresGradient[6]);
         //Backward
-        backwardPropagation(lenet, features, featuresGradient, gradientLenet);
+        backwardPropagation(lenet, features, featuresGradient, lenetGradient);
         //Update parameters
-        
+        printf("------TEST WEIGHT %p %p %p\n", &((lenetGradient[0])->weight), &((lenetGradient[1])->weight), &((lenetGradient[2])->weight));
         //Free memory
-        printf("FREE GRADIENT LENET \n");
-        freeLenet(&gradientLenet);
-        printf("FREE FEATURES \n");
-        freeFeatures(&features);
-        printf("FREE FEATURES GRADIENT \n");
-        freeFeatures(&featuresGradient);
-        
+        printf("----------------\nFREE GRADIENT LENET \n");
+        WEIGHT_FREE(&((lenetGradient[0])->weight));
+        printf("----------------\nFREE GRADIENT LENET \n");
+        WEIGHT_FREE(&((lenetGradient[1])->weight));
+        //WEIGHT_FREE(&((lenetGradient[2])->weight));
+        //freeLenet(&lenetGradient);
+        //printf("FREE FEATURES \n");
+        //freeFeatures(&features);
+        //printf("FREE FEATURES GRADIENT \n");
+        //freeFeatures(&featuresGradient);
     }
     
     // double k = ALPHA / batchSize;
@@ -111,7 +118,6 @@ void forwardPropagation(LeNet **lenet, Feature **features){
     subsampling_forward(features+3);
     convolution_forward(features+4, *lenet[2]);
     dotproduct_forward(features+5, *lenet[3]);
-    //printf("OK \n");
 }
 
 void backwardPropagation(LeNet **lenet, Feature **features, Feature **gradientFeatures, LeNet **gradientLenet){
@@ -121,7 +127,6 @@ void backwardPropagation(LeNet **lenet, Feature **features, Feature **gradientFe
     convolution_backward(features[3], *lenet[1], gradientFeatures+3, gradientLenet[1]);
     subsampling_backward(features[2], gradientFeatures+2);
     convolution_backward(features[1], *lenet[0], gradientFeatures+1, gradientLenet[0]);
-    //printf("OK \n");
 }
 
 // ----- Others ----- //

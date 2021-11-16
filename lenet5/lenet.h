@@ -37,13 +37,13 @@ extern void freeFeatures(Feature ***features);
 /* ----- FUNCTIONS ----- */
 //Training
 extern void updateParameters(LeNet **gradientLenet, LeNet **lenet, const number factor);
-extern void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, uint batchSize);
+extern void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uint batchSize);
 //Prediction
 extern uint8 predict(LeNet **lenet, uint8 *input, uint8 count);
 extern uint8 getResult(Feature *features, uint8 count);
 //Propagation
 extern void forwardPropagation(LeNet **lenet, Feature **features);
-extern void backwardPropagation(LeNet **lenet, Feature **features, Feature **gradientFeatures, LeNet **gradientLenet);
+extern void backwardPropagation(LeNet **lenet, Feature **features, Feature **featuresGradient, LeNet **lenetGradient);
 //Others
 extern void loadInput(uint8 *input, Feature *features);
 //Initial values
@@ -63,9 +63,9 @@ extern void dotproduct_forward(Feature **input, LeNet lenet);
 /* ----- BACKWARD ----- */
 extern void activation_backward(Feature *output, number (*action)(number));
 extern void convolute_backward(Matrix *input, Matrix *weight, Matrix *output);
-extern void convolution_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *gradientLenet);
+extern void convolution_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *lenetGradient);
 extern void subsampling_backward(Feature *input, Feature **inputGradient);
-extern void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *gradientLenet);
+extern void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *lenetGradient);
 
 /* ----- OTHERS ----- */
 extern void softMax(Feature *input, uint8 target, Feature *featureGradient);

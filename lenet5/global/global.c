@@ -61,9 +61,11 @@ Weight *WEIGHT(uint n, uint m, uint wm_n, uint wm_m){
 }
 
 void WEIGHT_FREE(Weight **we){
-    uint i, size = ((*we)->n)*((*we)->m);
+    uint i, size = WEIGHT_SIZE(*we);
+    printf("--------\nFREE MATRIX %u\n", size);
     for(i=0; i<size; i++)
         MATRIX_FREE(WEIGHT_GETMATRIX1P(*we, i));
+    printf("FREE POINTER \n");
     free((*we)->matrix);
     free(*we);
     *we = NULL;

@@ -26,7 +26,7 @@ void convolute_backward(Matrix *input, Matrix *weight, Matrix *output ){
     }
 }
 
-void convolution_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *gradientLenet){
+void convolution_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *lenetGradient){
     Feature *outputGradient = *(inputGradient - 1);
     //Aux variables
     uint wn, wm, matrixSize;
@@ -43,13 +43,13 @@ void convolution_backward(Feature *input, LeNet lenet, Feature **inputGradient, 
         auxMatrix = FEATURE_GETMATRIX(*inputGradient, 0);
         matrixSize = MATRIX_SIZE(auxMatrix);
         for(wm = 0; wm < matrixSize; wm++)
-            ARRAY_VALUE(gradientLenet->bias, wm) += MATRIX_VALUE1(auxMatrix, wm);
+            ARRAY_VALUE(lenetGradient->bias, wm) += MATRIX_VALUE1(auxMatrix, wm);
     }
     //Update weights
     for(wn = 0; wn < lenet.weight->n; wn++)
     for(wm = 0; wm < lenet.weight->m; wm++)
         convolute_forward(FEATURE_GETMATRIX(input, wn), FEATURE_GETMATRIX(*inputGradient, wm),
-                          WEIGHT_GETMATRIX(gradientLenet->weight, wn, wm));
+                          WEIGHT_GETMATRIX(lenetGradient->weight, wn, wm));
 }
 
 void subsampling_backward(Feature *input, Feature **inputGradient){
@@ -82,13 +82,13 @@ void subsampling_backward(Feature *input, Feature **inputGradient){
     }
 }
 
-void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *gradientLenet){
+void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *lenetGradient){
     Feature *outputGradient = *(inputGradient - 1);
     //Aux variables
     uint wn1, wn2, wm, wn1_aux, wn2_aux;
     Matrix *auxMatrix;
     Matrix *weightMatrix = WEIGHT_GETMATRIX1(lenet.weight, 0);
-    Matrix *weightGradientMatrix = WEIGHT_GETMATRIX1(gradientLenet->weight, 0);
+    Matrix *weightGradientMatrix = WEIGHT_GETMATRIX1(lenetGradient->weight, 0);
     Matrix *inputGradientMatrix = FEATURE_GETMATRIX(*inputGradient, 0);
     //Constants
     const uint wn1_length = outputGradient->n, wn2_length = (weightMatrix->n)/wn1_length;
@@ -106,8 +106,8 @@ void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, L
         }
     }
     //Update bias
-    for(wm = 0; wm < (gradientLenet->bias)->n; wm++)
-        ARRAY_VALUE(gradientLenet->bias, wm) += MATRIX_VALUE1(inputGradientMatrix, wm);
+    for(wm = 0; wm < (lenetGradient->bias)->n; wm++)
+        ARRAY_VALUE(lenetGradient->bias, wm) += MATRIX_VALUE1(inputGradientMatrix, wm);
     //Update weights
     auxMatrix = FEATURE_GETMATRIX(input, 0);
     for(wn1 = 0; wn1 < wn1_length; wn1++){

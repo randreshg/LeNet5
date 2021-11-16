@@ -37,6 +37,8 @@ int main()
     //Malloc 
     LeNet **lenet = LENET_INITIAL();
     setInitialValues(lenet);
+    printf("-------------------\n");
+    printf("PROCESS STARTED\n");
     //Training
     bool train = true;
     if(train)
@@ -54,7 +56,9 @@ int main()
     //printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
     printf("Time: %u\n", (unsigned)(clock() - start));
     //Free
-    freeLenet(&lenet);
+    printf("-------------------\n");
+    printf("FREE LENET MEMORY\n");
+    //freeLenet(&lenet);
     
     return 0;
 }
