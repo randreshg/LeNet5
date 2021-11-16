@@ -8,51 +8,77 @@ LeNet *LENET(const uint n, const uint m, const uint wm_n, const uint wm_m){
     return le;
 }
 
-// ----- Destructor ----- //
+void LENET_FREE(LeNet **lenet){
+    printf("Weight\n");
+    WEIGHT_FREE(&((*lenet)->weight));
+    printf("Bias\n");
+    ARRAY_FREE(&((*lenet)->bias));
+    free(*lenet);
+    *lenet = NULL;
+}
+// ----- Destructors ----- //
 void freeLenet(LeNet ***lenet){
-    LeNet **aux = *lenet;
-    for(int i=0; i<4; i++){
-        WEIGHT_FREE(&(aux[i]->weight));
-        ARRAY_FREE(&(aux[i]->bias));
-        free(aux[i]);
-    }
-    free(aux);
-    aux = NULL;
+    for(int i=0; i<4; i++)
+        LENET_FREE(lenet[i]);
+    free(*lenet);
+    *lenet = NULL;
 }
 
 void freeFeatures(Feature ***features){
     Feature **aux = *features;
-    for(int i=0; i<LAYERS+1; i++)
-        FEATURE_FREE(&aux[i]);
+    for(int i=0; i<7; i++)
+        FEATURE_FREE(aux+i);
     free(aux);
     aux = NULL;
 }
 
-// ----- Others ----- //
-void loadInput(uint8 *input, Feature *features)
+// ----- Training ----- //
+void updateParameters(LeNet **gradientLenet, LeNet **lenet, const number factor)
 {
-    //Aux variables
-    Matrix *inputMatrix = FEATURE_GETMATRIX(features, 0);
-    uint in, im;
-    number mean = 0, std = 0, val;
-    //Calculate standart deviation and mean
-    for(in = 0; in<IMG_SIZE; in++){
-        val = input[in];
-        mean += val;
-        std += val*val;
-    }
-    mean = mean/IMG_SIZE;
-    std = sqrt(std/IMG_SIZE - mean*mean);
-    //Normalize data and add padding
-    for(in=0; in<IMG_ROWS; in++)
-    for(im=0; im<IMG_COLS; im++)
-        MATRIX_VALUE(inputMatrix, in+2, im+2) = (input[in*IMG_COLS + im]-mean)/std;
+    
 }
 
+void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, uint batchSize)
+{
+    //Aux variables
+    uint i;
+    const number alpha = (float) LEARNING_RATE / batchSize;
+    Feature **features, **featuresGradient;
+    LeNet **gradientLenet;
+    for (i = 0; i < batchSize; i++) {
+        //Malloc memory
+        features = FEATURES_INITIAL();
+        featuresGradient = FEATURES_INITIAL();
+        gradientLenet = LENET_INITIAL();
+        //Load input
+        loadInput(input[i], *features);
+        //Forward propagation
+        forwardPropagation(lenet, features);
+        //SoftMax
+        softMax(features[6], labels[i], featuresGradient[6]);
+        //Backward
+        backwardPropagation(lenet, features, featuresGradient, gradientLenet);
+        //Update parameters
+        
+        //Free memory
+        printf("FREE GRADIENT LENET \n");
+        freeLenet(&gradientLenet);
+        printf("FREE FEATURES \n");
+        freeFeatures(&features);
+        printf("FREE FEATURES GRADIENT \n");
+        freeFeatures(&featuresGradient);
+        
+    }
+    
+    // double k = ALPHA / batchSize;
+    // FOREACH(i, GETCOUNT(LeNet5))
+    //     ((double *)lenet)[i] += k * buffer[i];
+}
+
+// ----- Prediction ----- //
 uint8 predict(LeNet **lenet, uint8 *input, uint8 count)
 {
     //Features initial values
-    //printf("Predicting... \n");
     Feature **features = FEATURES_INITIAL();
     //Load input
     loadInput(input, *features);
@@ -98,13 +124,34 @@ void backwardPropagation(LeNet **lenet, Feature **features, Feature **gradientFe
     //printf("OK \n");
 }
 
+// ----- Others ----- //
+void loadInput(uint8 *input, Feature *features)
+{
+    //Aux variables
+    Matrix *inputMatrix = FEATURE_GETMATRIX(features, 0);
+    uint in, im;
+    number mean = 0, std = 0, val;
+    //Calculate standart deviation and mean
+    for(in = 0; in<IMG_SIZE; in++){
+        val = input[in];
+        mean += val;
+        std += val*val;
+    }
+    mean = mean/IMG_SIZE;
+    std = sqrt(std/IMG_SIZE - mean*mean);
+    //Normalize data and add padding
+    for(in=0; in<IMG_ROWS; in++)
+    for(im=0; im<IMG_COLS; im++)
+        MATRIX_VALUE(inputMatrix, in+2, im+2) = (input[in*IMG_COLS + im]-mean)/std;
+}
+
 // ----- Initial values ----- //
 LeNet **LENET_INITIAL(){
     LeNet **lenet = malloc(4*sizeof(LeNet *));
     lenet[0] = LENET(INPUT, LAYER1, LENGTH_KERNEL, LENGTH_KERNEL);
     lenet[1] = LENET(LAYER2, LAYER3, LENGTH_KERNEL, LENGTH_KERNEL);
     lenet[2] = LENET(LAYER4, LAYER5, LENGTH_KERNEL, LENGTH_KERNEL);
-    lenet[3] = LENET(1, 1, LAYER5*LENGTH_FEATURE5*LENGTH_FEATURE5, OUTPUT);
+    lenet[3] = LENET(1, 1, LAYER5 * LENGTH_FEATURE5 * LENGTH_FEATURE5, OUTPUT);
     return lenet;
 }
 

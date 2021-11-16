@@ -31,7 +31,6 @@ void convolution_backward(Feature *input, LeNet lenet, Feature **inputGradient, 
     //Aux variables
     uint wn, wm, matrixSize;
     //Calculate output gradient
-    //printf("SIZE: %u - %u \n", lenet.weight->n, lenet.weight->m);
     for(wn = 0; wn < lenet.weight->n; wn++)
     for(wm = 0; wm < lenet.weight->m; wm++)
         convolute_backward(FEATURE_GETMATRIX(*inputGradient, wm), WEIGHT_GETMATRIX(lenet.weight, wn, wm), 
@@ -62,12 +61,10 @@ void subsampling_backward(Feature *input, Feature **inputGradient){
     const uint ln_length = FEATURE_GETMATRIX(outputGradient, 0)->n / FEATURE_GETMATRIX(*inputGradient, 0)->n,
                lm_length = FEATURE_GETMATRIX(outputGradient, 0)->m / FEATURE_GETMATRIX(*inputGradient, 0)->m;
     //Input array loop
-    //printf("SIZE: %u \n", (*inputGradient)->n);
     for(o = 0; o < (*inputGradient)->n; o++){
         inputMatrix = FEATURE_GETMATRIX(input, o);
         inputGradientMatrix = FEATURE_GETMATRIX(*inputGradient, o);
         outputGradientMatrix = FEATURE_GETMATRIX(outputGradient, o);
-        //printf("----------------- \n Size: %u, %u \n", inputGradientMatrix->n, inputGradientMatrix->m);
         //Input matrix loop
         for(on = 0; on < inputGradientMatrix->n; on++)
         for(om = 0; om < inputGradientMatrix->m; om++){
@@ -80,7 +77,6 @@ void subsampling_backward(Feature *input, Feature **inputGradient){
                         max = aux, maxLn = (aux_n + ln), maxLm = (aux_m + lm);
                 }
             }
-            //printf("OK: %f \n", MATRIX_VALUE(outputGradientMatrix, maxLn, maxLm));
             MATRIX_VALUE(outputGradientMatrix, maxLn, maxLm) = MATRIX_VALUE(inputGradientMatrix, on, om);
         }
     }

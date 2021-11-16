@@ -2,3 +2,4 @@ lenetcnn
 lenet.o
 forward.o
 lenetcnn
+lenet.o

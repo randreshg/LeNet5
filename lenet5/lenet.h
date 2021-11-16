@@ -2,6 +2,7 @@
 #include "global/global.h"
 #include "mnist/mnist.h"
 /* ----- CONSTANTS ----- */
+#define LEARNING_RATE   0.5
 #define LENGTH_KERNEL   5
 //Features
 #define LENGTH_FEATURE0 32
@@ -29,16 +30,22 @@ typedef struct
 
 /* ----- CONSTRUCTOR ----- */
 extern LeNet *LENET(uint n, uint m, uint wm_n, uint wm_m);
+extern void LENET_FREE(LeNet **lenet);
+
 extern void freeLenet(LeNet ***lenet);
 extern void freeFeatures(Feature ***features);
 /* ----- FUNCTIONS ----- */
-//Others
-extern void loadInput(uint8 *input, Feature *features);
+//Training
+extern void updateParameters(LeNet **gradientLenet, LeNet **lenet, const number factor);
+extern void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, uint batchSize);
+//Prediction
 extern uint8 predict(LeNet **lenet, uint8 *input, uint8 count);
 extern uint8 getResult(Feature *features, uint8 count);
 //Propagation
 extern void forwardPropagation(LeNet **lenet, Feature **features);
 extern void backwardPropagation(LeNet **lenet, Feature **features, Feature **gradientFeatures, LeNet **gradientLenet);
+//Others
+extern void loadInput(uint8 *input, Feature *features);
 //Initial values
 extern LeNet **LENET_INITIAL();
 extern Feature **FEATURES_INITIAL();

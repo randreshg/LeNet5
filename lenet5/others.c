@@ -17,18 +17,18 @@ void softMax(Feature *input, uint8 target, Feature *featureGradient){
     Matrix *gradientMatrix = FEATURE_GETMATRIX(featureGradient, 0);
     //Get denominator
     for(om = 0; om < inputMatrix->m; om++){
-        //printf("%u: %f \n", om, MATRIX_VALUE1(inputMatrix, om));
         MATRIX_VALUE1(gradientMatrix, om) = exp(MATRIX_VALUE1(inputMatrix, om));
         den += MATRIX_VALUE1(gradientMatrix, om);
     }
-    //printf("Denominator: %f \n", den);
     for(om = 0; om < inputMatrix->m; om++){
         //Softmax calculation
         ARRAY_VALUE(gradientMatrix, om) = MATRIX_VALUE1(gradientMatrix, om)/den;
-        //printf("%f \n", MATRIX_VALUE1(gradientMatrix, om));
         //Softmax gradient
-        if(om==target)
+        if(om==target){
+            printf("COST: %f \n", -log(MATRIX_VALUE1(gradientMatrix, om)/inputMatrix->m));
             MATRIX_VALUE1(gradientMatrix, om) = MATRIX_VALUE1(gradientMatrix,om)-1;
+        }
+            
     }
 }
 

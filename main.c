@@ -16,36 +16,7 @@ uint testing(LeNet **lenet, uint8 test_image[][IMG_SIZE], uint8 *test_label, uin
     return rightPredictions;
 }
 
-void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, uint batchSize)
-{
-    //Aux variables
-    uint i;
-    number cost;
-    Feature **features;
-    Feature **featuresGradient = FEATURES_INITIAL();
-    LeNet **gradientLenet = LENET_INITIAL();
-    for (i = 0; i < batchSize; i++)
-    {
-        //Malloc features
-        features = FEATURES_INITIAL();
-        //Load input
-        loadInput(input[i], *features);
-        //Forward propagation
-        forwardPropagation(lenet, features);
-        //SoftMax
-        softMax(features[6], labels[i], featuresGradient[6]);
-        //Backward
-        backwardPropagation(lenet, features, featuresGradient, gradientLenet);
-        //Update weights
 
-        //Free memory
-        freeFeatures(&features);
-    }
-    
-    // double k = ALPHA / batchSize;
-    // FOREACH(i, GETCOUNT(LeNet5))
-    //     ((double *)lenet)[i] += k * buffer[i];
-}
 
 void training(LeNet **lenet){
     //Read training data
