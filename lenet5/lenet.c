@@ -9,21 +9,16 @@ LeNet *LENET(const uint n, const uint m, const uint wm_n, const uint wm_m){
 }
 
 void LENET_FREE(LeNet **lenet){
-    printf("-Weight %p\n", &((*lenet)->weight));
     WEIGHT_FREE(&((*lenet)->weight));
-    // printf("-Bias %p\n", (*lenet)->bias);
-    // ARRAY_FREE(&((*lenet)->bias));
-    // printf("-Pointer %p\n", *lenet);
-    // free(*lenet);
-    // *lenet = NULL;
+    ARRAY_FREE(&((*lenet)->bias));
+    free(*lenet);
+    *lenet = NULL;
 }
 // ----- Destructors ----- //
 void freeLenet(LeNet ***lenet){
     LeNet **aux = *lenet;
-    for(int i=0; i<4; i++){
-        printf("ok\n");
+    for(int i=0; i<4; i++)
         LENET_FREE(aux+i);
-    }
     free(aux);
     aux = NULL;
 }
@@ -37,7 +32,7 @@ void freeFeatures(Feature ***features){
 }
 
 // ----- Training ----- //
-void updateParameters(LeNet **gradientLenet, LeNet **lenet, const number factor)
+void updateParameters(LeNet **lenetGradient, LeNet **lenet, const number factor)
 {
     
 }
@@ -63,17 +58,13 @@ void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uin
         //Backward
         backwardPropagation(lenet, features, featuresGradient, lenetGradient);
         //Update parameters
-        printf("------TEST WEIGHT %p %p %p\n", &((lenetGradient[0])->weight), &((lenetGradient[1])->weight), &((lenetGradient[2])->weight));
+
         //Free memory
-        printf("----------------\nFREE GRADIENT LENET \n");
-        WEIGHT_FREE(&((lenetGradient[0])->weight));
-        printf("----------------\nFREE GRADIENT LENET \n");
-        WEIGHT_FREE(&((lenetGradient[1])->weight));
-        //WEIGHT_FREE(&((lenetGradient[2])->weight));
-        //freeLenet(&lenetGradient);
-        //printf("FREE FEATURES \n");
+        printf("---------\nFREE GRADIENT LENET \n");
+        freeLenet(&lenetGradient);
+        printf("FREE FEATURES \n");
         //freeFeatures(&features);
-        //printf("FREE FEATURES GRADIENT \n");
+        printf("FREE FEATURES GRADIENT \n");
         //freeFeatures(&featuresGradient);
     }
     
@@ -121,12 +112,12 @@ void forwardPropagation(LeNet **lenet, Feature **features){
 }
 
 void backwardPropagation(LeNet **lenet, Feature **features, Feature **gradientFeatures, LeNet **gradientLenet){
-    dotproduct_backward(features[6], *lenet[3], gradientFeatures+6, gradientLenet[3]);
-    convolution_backward(features[5], *lenet[2], gradientFeatures+5, gradientLenet[2]);
-    subsampling_backward(features[4], gradientFeatures+4);
-    convolution_backward(features[3], *lenet[1], gradientFeatures+3, gradientLenet[1]);
-    subsampling_backward(features[2], gradientFeatures+2);
-    convolution_backward(features[1], *lenet[0], gradientFeatures+1, gradientLenet[0]);
+    dotproduct_backward(features[5], *lenet[3], gradientFeatures+6, gradientLenet[3]);
+    convolution_backward(features[4], *lenet[2], gradientFeatures+5, gradientLenet[2]);
+    subsampling_backward(features[3], gradientFeatures+4);
+    convolution_backward(features[2], *lenet[1], gradientFeatures+3, gradientLenet[1]);
+    //subsampling_backward(features[1], gradientFeatures+2);
+    //convolution_backward(features[0], *lenet[0], gradientFeatures+1, gradientLenet[0]);
 }
 
 // ----- Others ----- //

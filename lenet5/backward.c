@@ -56,20 +56,21 @@ void subsampling_backward(Feature *input, Feature **inputGradient){
     Feature *outputGradient = *(inputGradient - 1);
     //Aux variables
     Matrix *inputMatrix, *inputGradientMatrix, *outputGradientMatrix;
-    uint o, on, om, ln, lm, maxLn, maxLm, aux_n, aux_m;
+    uint i, in, im, ln, lm, maxLn, maxLm, aux_n, aux_m;
     number max, aux;
     const uint ln_length = FEATURE_GETMATRIX(outputGradient, 0)->n / FEATURE_GETMATRIX(*inputGradient, 0)->n,
                lm_length = FEATURE_GETMATRIX(outputGradient, 0)->m / FEATURE_GETMATRIX(*inputGradient, 0)->m;
+    printf("N:%u, M:%u \n", ln_length, lm_length);
     //Input array loop
-    for(o = 0; o < (*inputGradient)->n; o++){
-        inputMatrix = FEATURE_GETMATRIX(input, o);
-        inputGradientMatrix = FEATURE_GETMATRIX(*inputGradient, o);
-        outputGradientMatrix = FEATURE_GETMATRIX(outputGradient, o);
+    for(i = 0; i < (*inputGradient)->n; i++){
+        inputMatrix = FEATURE_GETMATRIX(input, i);
+        inputGradientMatrix = FEATURE_GETMATRIX(*inputGradient, i);
+        outputGradientMatrix = FEATURE_GETMATRIX(outputGradient, i);
         //Input matrix loop
-        for(on = 0; on < inputGradientMatrix->n; on++)
-        for(om = 0; om < inputGradientMatrix->m; om++){
+        for(in = 0; in < inputGradientMatrix->n; in++)
+        for(im = 0; im < inputGradientMatrix->m; im++){
             //Subsampling
-            max = -1.0, aux_n = ln_length*on, aux_m = lm_length*om;
+            max = -1.0, aux_n = ln_length*in, aux_m = lm_length*im;
             for(ln = 0; ln < ln_length; ln++){
                 for(lm = 0; lm < lm_length; lm++){
                     aux = MATRIX_VALUE(inputMatrix, (aux_n + ln), (aux_m + lm));
@@ -77,7 +78,7 @@ void subsampling_backward(Feature *input, Feature **inputGradient){
                         max = aux, maxLn = (aux_n + ln), maxLm = (aux_m + lm);
                 }
             }
-            MATRIX_VALUE(outputGradientMatrix, maxLn, maxLm) = MATRIX_VALUE(inputGradientMatrix, on, om);
+            MATRIX_VALUE(outputGradientMatrix, maxLn, maxLm) = MATRIX_VALUE(inputGradientMatrix, in, im);
         }
     }
 }
