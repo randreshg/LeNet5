@@ -48,16 +48,16 @@ void subsampling_forward(Feature **input){
     const uint ln_length = FEATURE_GETMATRIX(*input, 0)->n / FEATURE_GETMATRIX(output, 0)->n,
                lm_length = FEATURE_GETMATRIX(*input, 0)->m / FEATURE_GETMATRIX(output, 0)->m;
     //Ouput array loop
-    for(o = 0; o < output->n; o++){
+    for(o = 0; o < output->n; o++) {
         inputMatrix = FEATURE_GETMATRIX(*input, o);
         outputMatrix = FEATURE_GETMATRIX(output, o);
         //Output matrix loop
         for(on = 0; on < outputMatrix->n; on++)
-        for(om = 0; om < outputMatrix->m; om++){
+        for(om = 0; om < outputMatrix->m; om++) {
             //Subsampling
-            max = -1, aux_n = ln_length*on, aux_m = lm_length*om;
+            max = -1.0, aux_n = ln_length * on, aux_m = lm_length * om;
             for(ln = 0; ln < ln_length; ln++)
-                for(lm = 0; lm < lm_length; lm++){
+                for(lm = 0; lm < lm_length; lm++) {
                     aux = MATRIX_VALUE(inputMatrix, (aux_n + ln), (aux_m + lm));
                     max = aux > max ? aux:max;
                 }
@@ -73,14 +73,14 @@ void dotproduct_forward(Feature **input, LeNet lenet){
     Matrix *inputMatrix;
     Matrix *weightMatrix = WEIGHT_GETMATRIX(lenet.weight, 0, 0);
     Matrix *outputMatrix = FEATURE_GETMATRIX(output, 0);
-    const uint wn1_length = (*input)->n, wn2_length = (weightMatrix->n)/wn1_length;
+    const uint wn1_length = (*input)->n, wn2_length = (weightMatrix->n) / wn1_length;
     //Dot product
     for(wn1 = 0; wn1 < wn1_length; wn1++){
         inputMatrix = FEATURE_GETMATRIX(*input, wn1);
-        wn1_aux = wn1*wn2_length;
+        wn1_aux = wn1 * wn2_length;
         for(wn2 = 0; wn2 < wn2_length; wn2++)
         for(wm = 0; wm < weightMatrix->m; wm++)
-            MATRIX_VALUE1(outputMatrix, wm) += MATRIX_VALUE1(inputMatrix, wn2) * MATRIX_VALUE(weightMatrix, (wn1_aux+wn2), wm);
+            MATRIX_VALUE1(outputMatrix, wm) += MATRIX_VALUE1(inputMatrix, wn2) * MATRIX_VALUE(weightMatrix, wn1_aux + wn2, wm);
     }
     //Activation function
     activation_forward(output, lenet.bias, ReLU);

@@ -64,7 +64,7 @@ void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uin
     //Aux variables
     const number alpha = LEARNING_RATE / batchSize;
     uint i;
-    LeNet **lenetGradient;
+    LeNet **buffer, **lenetGradient;
     Feature **features, **featuresGradient;
     for (i = 0; i < batchSize; i++) {
         //Malloc memory
@@ -86,6 +86,7 @@ void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uin
         freeFeatures(&features);
         freeFeatures(&featuresGradient);
     }
+    updateParameters(buffer, lenet, alpha);
 }
 
 // ----- Prediction ----- //
@@ -103,8 +104,8 @@ uint8 predict(LeNet **lenet, uint8 *input, uint8 count) {
 }
 
 uint8 getResult(Feature *features, uint8 count) {
-    uint8 om, result=-1;
-    number max = -1;
+    uint8 om, result=0;
+    number max = -1.0;
     Matrix *output = FEATURE_GETMATRIX(features, 0);
     for(om = 0; om < output->m; om++){
         if(MATRIX_VALUE1(output, om) > max){
@@ -125,13 +126,13 @@ void forwardPropagation(LeNet **lenet, Feature **features) {
     dotproduct_forward(features+5, *lenet[3]);
 }
 
-void backwardPropagation(LeNet **lenet, Feature **features, LeNet **gradientLenet, Feature **gradientFeatures){
-    dotproduct_backward(features[5], *lenet[3], gradientFeatures+6, gradientLenet[3]);
-    convolution_backward(features[4], *lenet[2], gradientFeatures+5, gradientLenet[2]);
-    subsampling_backward(features[3], gradientFeatures+4);
-    convolution_backward(features[2], *lenet[1], gradientFeatures+3, gradientLenet[1]);
-    subsampling_backward(features[1], gradientFeatures+2);
-    convolution_backward(features[0], *lenet[0], gradientFeatures+1, gradientLenet[0]);
+void backwardPropagation(LeNet **lenet, Feature **features, LeNet **lenetGradient, Feature **featuresGradient){
+    dotproduct_backward(features[5], *lenet[3], featuresGradient+6, lenetGradient[3]);
+    convolution_backward(features[4], *lenet[2], featuresGradient+5, lenetGradient[2]);
+    subsampling_backward(features[3], featuresGradient+4);
+    convolution_backward(features[2], *lenet[1], featuresGradient+3, lenetGradient[1]);
+    subsampling_backward(features[1], featuresGradient+2);
+    convolution_backward(features[0], *lenet[0], featuresGradient+1, lenetGradient[0]);
 }
 
 // ----- Others ----- //
@@ -140,7 +141,7 @@ void loadInput(uint8 *input, Feature *features) {
     Matrix *inputMatrix = FEATURE_GETMATRIX(features, 0);
     uint in, im;
     number mean = 0, std = 0, val;
-    //Calculate standart deviation and mean
+    //Calculate standar deviation and mean
     for(in = 0; in < IMG_SIZE; in++){
         val = input[in];
         mean += val;
@@ -177,7 +178,6 @@ Feature **FEATURES_INITIAL() {
 }
 
 void setInitialValues(LeNet **lenet) {
-    //srand((unsigned int)time(NULL));
     initialValues(lenet[0],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (INPUT + LAYER1))));
     initialValues(lenet[1],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (LAYER2 + LAYER3))));
     initialValues(lenet[2],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (LAYER4 + LAYER5))));

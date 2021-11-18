@@ -85,7 +85,7 @@ void subsampling_backward(Feature *input, Feature **inputGradient){
 void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *lenetGradient){
     Feature *outputGradient = *(inputGradient - 1);
     //Aux variables
-    uint wn1, wn2, wm, wn1_aux, wn2_aux;
+    uint wn1, wn2, wm, wn1_aux;
     Matrix *auxMatrix;
     Matrix *weightMatrix = WEIGHT_GETMATRIX1(lenet.weight, 0);
     Matrix *weightGradientMatrix = WEIGHT_GETMATRIX1(lenetGradient->weight, 0);
@@ -95,28 +95,26 @@ void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, L
     //Dot product + activation function
     for(wn1 = 0; wn1 < wn1_length; wn1++){
         auxMatrix = FEATURE_GETMATRIX(outputGradient, wn1);
-        wn1_aux = wn1*wn2_length;
+        wn1_aux = wn1 * wn2_length;
         for(wn2 = 0; wn2 < wn2_length; wn2++){
-            wn2_aux = wn1_aux+wn2;
             //Dot product
             for(wm = 0; wm < weightMatrix->m; wm++)
-                MATRIX_VALUE1(auxMatrix, wn2) += MATRIX_VALUE1(inputGradientMatrix, wm) * MATRIX_VALUE(weightMatrix, wn2_aux, wm);
-            //Activation function + bias
-            MATRIX_VALUE1(auxMatrix, wn2) *= ReLU_GRAD(MATRIX_VALUE1(auxMatrix, wn2));
+                MATRIX_VALUE1(auxMatrix, wn2) += MATRIX_VALUE1(inputGradientMatrix, wm) * MATRIX_VALUE(weightMatrix, wn1_aux + wn2, wm);
         }
     }
+    //Activation function
+    activation_backward(outputGradient, ReLU_GRAD);
     //Update bias
     for(wm = 0; wm < (lenetGradient->bias)->n; wm++)
         ARRAY_VALUE(lenetGradient->bias, wm) += MATRIX_VALUE1(inputGradientMatrix, wm);
     //Update weights
     auxMatrix = FEATURE_GETMATRIX(input, 0);
     for(wn1 = 0; wn1 < wn1_length; wn1++){
-        wn1_aux = wn1*wn2_length;
+        wn1_aux = wn1 * wn2_length;
         for(wn2 = 0; wn2 < wn2_length; wn2++){
-            wn2_aux = wn1_aux+wn2;
             //Dot product
             for(wm = 0; wm < weightMatrix->m; wm++)
-                MATRIX_VALUE(weightGradientMatrix, wn2_aux, wm) += MATRIX_VALUE1(auxMatrix, wn2)*MATRIX_VALUE1(inputGradientMatrix, wm);
+                MATRIX_VALUE(weightGradientMatrix, wn1_aux + wn2, wm) += MATRIX_VALUE1(auxMatrix, wn2) * MATRIX_VALUE1(inputGradientMatrix, wm);
         }
     }
 }

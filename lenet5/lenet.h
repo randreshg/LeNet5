@@ -45,7 +45,7 @@ extern uint8 predict(LeNet **lenet, uint8 *input, uint8 count);
 extern uint8 getResult(Feature *features, uint8 count);
 //Propagation
 extern void forwardPropagation(LeNet **lenet, Feature **features);
-extern void backwardPropagation(LeNet **lenet, Feature **features, LeNet **gradientLenet, Feature **gradientFeatures);
+extern void backwardPropagation(LeNet **lenet, Feature **features, LeNet **lenetGradient, Feature **featuresGradient);
 //Others
 extern void loadInput(uint8 *input, Feature *features);
 //Initial values
