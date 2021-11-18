@@ -21,7 +21,7 @@ Feature *FEATURE(uint n, uint fm_n, uint fm_m){
     FEATURE_MALLOCMATRIX(fe);
     uint i;
     for(i=0; i<fe->n; i++)
-        fe->matrix[i] = MATRIX(fm_n, fm_m);
+        FEATURE_GETMATRIX(fe, i) = MATRIX(fm_n, fm_m);
     return fe;
 }
 
@@ -56,7 +56,7 @@ Weight *WEIGHT(uint n, uint m, uint wm_n, uint wm_m){
     WEIGHT_MALLOCMATRIX(we);
     uint i, size = n*m;
     for(i=0; i<size; i++)
-        we->matrix[i] = MATRIX(wm_n, wm_m);
+        WEIGHT_GETMATRIX1(we, i) = MATRIX(wm_n, wm_m);
     return we;
 }
 

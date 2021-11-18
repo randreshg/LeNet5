@@ -116,8 +116,8 @@ void backwardPropagation(LeNet **lenet, Feature **features, Feature **gradientFe
     convolution_backward(features[4], *lenet[2], gradientFeatures+5, gradientLenet[2]);
     subsampling_backward(features[3], gradientFeatures+4);
     convolution_backward(features[2], *lenet[1], gradientFeatures+3, gradientLenet[1]);
-    //subsampling_backward(features[1], gradientFeatures+2);
-    //convolution_backward(features[0], *lenet[0], gradientFeatures+1, gradientLenet[0]);
+    subsampling_backward(features[1], gradientFeatures+2);
+    convolution_backward(features[0], *lenet[0], gradientFeatures+1, gradientLenet[0]);
 }
 
 // ----- Others ----- //
@@ -143,7 +143,7 @@ void loadInput(uint8 *input, Feature *features)
 
 // ----- Initial values ----- //
 LeNet **LENET_INITIAL(){
-    LeNet **lenet = malloc(4*sizeof(LeNet *));
+    LeNet **lenet = (LeNet **) malloc(4*sizeof(LeNet *));
     lenet[0] = LENET(INPUT, LAYER1, LENGTH_KERNEL, LENGTH_KERNEL);
     lenet[1] = LENET(LAYER2, LAYER3, LENGTH_KERNEL, LENGTH_KERNEL);
     lenet[2] = LENET(LAYER4, LAYER5, LENGTH_KERNEL, LENGTH_KERNEL);
@@ -152,7 +152,7 @@ LeNet **LENET_INITIAL(){
 }
 
 Feature **FEATURES_INITIAL(){
-    Feature **features = malloc(7*sizeof(LeNet *));
+    Feature **features = (Feature **) malloc(7*sizeof(Feature *));
     features[0] = FEATURE(INPUT, LENGTH_FEATURE0, LENGTH_FEATURE0);
     features[1] = FEATURE(LAYER1, LENGTH_FEATURE1, LENGTH_FEATURE1);
     features[2] = FEATURE(LAYER2, LENGTH_FEATURE2, LENGTH_FEATURE2);
