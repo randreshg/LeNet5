@@ -2,7 +2,7 @@
 #include "global/global.h"
 #include "mnist/mnist.h"
 /* ----- CONSTANTS ----- */
-#define LEARNING_RATE   0.5
+#define LEARNING_RATE   10
 #define LENGTH_KERNEL   5
 //Features
 #define LENGTH_FEATURE0 32
@@ -36,14 +36,16 @@ extern void freeLenet(LeNet ***lenet);
 extern void freeFeatures(Feature ***features);
 /* ----- FUNCTIONS ----- */
 //Training
-extern void updateParameters(LeNet **gradientLenet, LeNet **lenet, const number factor);
+extern void updateWeight(Weight *weightGradient, Weight *weight, const number factor);
+extern void updateBias(Array *biasGradient, Array *bias, const number factor);
+extern void updateParameters(LeNet **lenetGradient, LeNet **lenet, const number factor);
 extern void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uint batchSize);
 //Prediction
 extern uint8 predict(LeNet **lenet, uint8 *input, uint8 count);
 extern uint8 getResult(Feature *features, uint8 count);
 //Propagation
 extern void forwardPropagation(LeNet **lenet, Feature **features);
-extern void backwardPropagation(LeNet **lenet, Feature **features, Feature **featuresGradient, LeNet **lenetGradient);
+extern void backwardPropagation(LeNet **lenet, Feature **features, LeNet **gradientLenet, Feature **gradientFeatures);
 //Others
 extern void loadInput(uint8 *input, Feature *features);
 //Initial values

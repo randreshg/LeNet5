@@ -32,15 +32,40 @@ void freeFeatures(Feature ***features){
 }
 
 // ----- Training ----- //
+void updateWeight(Weight *weightGradient, Weight *weight, const number factor)
+{
+    uint w, m, wSize, mSize;
+    Matrix *auxMatrix, *auxGradMatrix;
+    wSize = WEIGHT_SIZE(weight);
+    for(w = 0; w < wSize; w++){
+        auxMatrix = WEIGHT_GETMATRIX1(weight, w);
+        auxGradMatrix = WEIGHT_GETMATRIX1(weightGradient, w);
+        mSize = MATRIX_SIZE(auxMatrix);
+        for(m = 0; m < mSize; m++)
+            MATRIX_VALUE1(auxMatrix, m) = MATRIX_VALUE1(auxMatrix, m) - factor*MATRIX_VALUE1(auxGradMatrix, m);
+    }
+}
+
+void updateBias(Array *biasGradient, Array *bias, const number factor)
+{
+    uint n;
+    for(n = 0; n < bias->n; n++)
+        ARRAY_VALUE(bias, n) = ARRAY_VALUE(bias, n) - factor*ARRAY_VALUE(biasGradient, n);
+}
+
 void updateParameters(LeNet **lenetGradient, LeNet **lenet, const number factor)
 {
-    
+    uint8 i;
+    for(i = 0; i < 4; i++){
+        updateWeight(lenetGradient[i]->weight, lenet[i]->weight, factor);
+        updateBias(lenetGradient[i]->bias, lenet[i]->bias, factor);
+    }
 }
 
 void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uint batchSize)
 {
     //Aux variables
-    const number alpha = (float) LEARNING_RATE / batchSize;
+    const number alpha = LEARNING_RATE / batchSize;
     uint i;
     LeNet **lenetGradient;
     Feature **features, **featuresGradient;
@@ -56,18 +81,14 @@ void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uin
         //SoftMax
         softMax(features[6], labels[i], featuresGradient[6]);
         //Backward
-        backwardPropagation(lenet, features, featuresGradient, lenetGradient);
+        backwardPropagation(lenet, features, lenetGradient, featuresGradient);
         //Update parameters
-
+        updateParameters(lenetGradient, lenet, alpha);
         //Free memory
         freeLenet(&lenetGradient);
         freeFeatures(&features);
         freeFeatures(&featuresGradient);
     }
-    
-    // double k = ALPHA / batchSize;
-    // FOREACH(i, GETCOUNT(LeNet5))
-    //     ((double *)lenet)[i] += k * buffer[i];
 }
 
 // ----- Prediction ----- //
@@ -108,7 +129,7 @@ void forwardPropagation(LeNet **lenet, Feature **features){
     dotproduct_forward(features+5, *lenet[3]);
 }
 
-void backwardPropagation(LeNet **lenet, Feature **features, Feature **gradientFeatures, LeNet **gradientLenet){
+void backwardPropagation(LeNet **lenet, Feature **features, LeNet **gradientLenet, Feature **gradientFeatures){
     dotproduct_backward(features[5], *lenet[3], gradientFeatures+6, gradientLenet[3]);
     convolution_backward(features[4], *lenet[2], gradientFeatures+5, gradientLenet[2]);
     subsampling_backward(features[3], gradientFeatures+4);
@@ -171,13 +192,12 @@ void setInitialValues(LeNet **lenet){
 void randInitialValues(LeNet *lenet){
     uint n, m, i, matrixSize;
     Matrix *matrix;
-    
     for(n=0; n<lenet->weight->n; n++){
         for(m=0; m<lenet->weight->m; m++){
             matrix = WEIGHT_GETMATRIX(lenet->weight, n, m);
             matrixSize = MATRIX_SIZE(matrix);
             for(i=0; i<matrixSize; i++){
-                MATRIX_VALUE1(matrix, i) = f32Rand(1);
+                MATRIX_VALUE1(matrix, i) = f32Rand(3);
             }
         }
     }
