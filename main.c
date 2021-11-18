@@ -11,8 +11,8 @@ uint testing(LeNet **lenet, uint8 test_image[][IMG_SIZE], uint8 *test_label, uin
         prediction = predict(lenet, test_image[i], 10);
         //printf("TARGET:%u - PREDICTION:%u\n", test_label[i], prediction);
         rightPredictions += (test_label[i] == prediction);
-        // if (i * 100 / total_size > percent)
-        //     printf("test:%2d%%\n", percent = i*100/total_size);
+        if (i * 100 / total_size > percent)
+            printf("test:%2d%%\n", percent = i*100/total_size);
     }
     return rightPredictions;
 }

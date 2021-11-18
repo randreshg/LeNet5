@@ -18,16 +18,16 @@ void LENET_FREE(LeNet **lenet){
 // ----- Destructors ----- //
 void freeLenet(LeNet ***lenet){
     LeNet **aux = *lenet;
-    for(int i=0; i<4; i++)
-        LENET_FREE(aux+i);
+    for(int i = 0; i < 4; i++)
+        LENET_FREE(aux + i);
     free(aux);
     aux = NULL;
 }
 
 void freeFeatures(Feature ***features){
     Feature **aux = *features;
-    for(int i=0; i<7; i++)
-        FEATURE_FREE(aux+i);
+    for(int i = 0; i < 7; i++)
+        FEATURE_FREE(aux + i);
     free(aux);
     aux = NULL;
 }
@@ -106,7 +106,7 @@ uint8 getResult(Feature *features, uint8 count) {
     uint8 om, result=-1;
     number max = -1;
     Matrix *output = FEATURE_GETMATRIX(features, 0);
-    for(om=0; om<output->m;om++){
+    for(om = 0; om < output->m; om++){
         if(MATRIX_VALUE1(output, om) > max){
             max = MATRIX_VALUE1(output, om);
             result = om;
@@ -141,22 +141,22 @@ void loadInput(uint8 *input, Feature *features) {
     uint in, im;
     number mean = 0, std = 0, val;
     //Calculate standart deviation and mean
-    for(in = 0; in<IMG_SIZE; in++){
+    for(in = 0; in < IMG_SIZE; in++){
         val = input[in];
         mean += val;
-        std += val*val;
+        std += val * val;
     }
-    mean = mean/IMG_SIZE;
-    std = sqrt(std/IMG_SIZE - mean*mean);
+    mean = mean / IMG_SIZE;
+    std = sqrt(std / IMG_SIZE - mean * mean);
     //Normalize data and add padding
-    for(in=0; in<IMG_ROWS; in++)
-    for(im=0; im<IMG_COLS; im++)
-        MATRIX_VALUE(inputMatrix, in+2, im+2) = (input[in*IMG_COLS + im]-mean)/std;
+    for(in = 0; in < IMG_ROWS; in++)
+    for(im = 0; im < IMG_COLS; im++)
+        MATRIX_VALUE(inputMatrix, in + 2, im + 2) = (input[in*IMG_COLS + im] - mean) / std;
 }
 
 // ----- Initial values ----- //
 LeNet **LENET_INITIAL() {
-    LeNet **lenet = (LeNet **) malloc(4*sizeof(LeNet *));
+    LeNet **lenet = (LeNet **) malloc(4 * sizeof(LeNet *));
     lenet[0] = LENET(INPUT, LAYER1, LENGTH_KERNEL, LENGTH_KERNEL);
     lenet[1] = LENET(LAYER2, LAYER3, LENGTH_KERNEL, LENGTH_KERNEL);
     lenet[2] = LENET(LAYER4, LAYER5, LENGTH_KERNEL, LENGTH_KERNEL);
@@ -165,7 +165,7 @@ LeNet **LENET_INITIAL() {
 }
 
 Feature **FEATURES_INITIAL() {
-    Feature **features = (Feature **) malloc(7*sizeof(Feature *));
+    Feature **features = (Feature **) malloc(7 * sizeof(Feature *));
     features[0] = FEATURE(INPUT, LENGTH_FEATURE0, LENGTH_FEATURE0);
     features[1] = FEATURE(LAYER1, LENGTH_FEATURE1, LENGTH_FEATURE1);
     features[2] = FEATURE(LAYER2, LENGTH_FEATURE2, LENGTH_FEATURE2);
@@ -177,7 +177,7 @@ Feature **FEATURES_INITIAL() {
 }
 
 void setInitialValues(LeNet **lenet) {
-    srand((unsigned int)time(NULL));
+    //srand((unsigned int)time(NULL));
     initialValues(lenet[0],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (INPUT + LAYER1))));
     initialValues(lenet[1],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (LAYER2 + LAYER3))));
     initialValues(lenet[2],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (LAYER4 + LAYER5))));
@@ -203,11 +203,11 @@ static double f64rand()
 void randInitialValues(LeNet *lenet) {
     uint n, m, i, matrixSize;
     Matrix *matrix;
-    for(n=0; n<lenet->weight->n; n++){
-        for(m=0; m<lenet->weight->m; m++){
+    for(n = 0; n < lenet->weight->n; n++){
+        for(m = 0; m < lenet->weight->m; m++){
             matrix = WEIGHT_GETMATRIX(lenet->weight, n, m);
             matrixSize = MATRIX_SIZE(matrix);
-            for(i=0; i<matrixSize; i++){
+            for(i = 0; i < matrixSize; i++){
                 MATRIX_VALUE1(matrix, i) = f64rand();
             }
         }
@@ -218,12 +218,12 @@ void initialValues(LeNet *lenet, const number value) {
     uint n, m, i, matrixSize;
     Matrix *matrix;
     randInitialValues(lenet);
-    for(n=0; n<lenet->weight->n; n++){
-        for(m=0; m<lenet->weight->m; m++){
+    for(n = 0; n < lenet->weight->n; n++){
+        for(m = 0; m < lenet->weight->m; m++){
             matrix = WEIGHT_GETMATRIX(lenet->weight, n, m);
             matrixSize = MATRIX_SIZE(matrix);
-            for(i=0; i<matrixSize; i++)
-                MATRIX_VALUE1(matrix, i) *=value;
+            for(i = 0; i < matrixSize; i++)
+                MATRIX_VALUE1(matrix, i) *= value;
         }
     }
 }

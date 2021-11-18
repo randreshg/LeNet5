@@ -40,7 +40,7 @@ void convolution_backward(Feature *input, LeNet lenet, Feature **inputGradient, 
     //Update bias
     Matrix *auxMatrix;
     for(wn = 0; wn < (*inputGradient)->n; wn++){
-        auxMatrix = FEATURE_GETMATRIX(*inputGradient, 0);
+        auxMatrix = FEATURE_GETMATRIX(*inputGradient, wn);
         matrixSize = MATRIX_SIZE(auxMatrix);
         for(wm = 0; wm < matrixSize; wm++)
             ARRAY_VALUE(lenetGradient->bias, wn) += MATRIX_VALUE1(auxMatrix, wm);
