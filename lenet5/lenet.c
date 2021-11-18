@@ -184,21 +184,22 @@ void setInitialValues(LeNet **lenet) {
     initialValues(lenet[3],  sqrt(6.0 / (LAYER5 + OUTPUT)));
 }
 
-// static double f64rand()
-// {
-//     static int randbit = 0;
-//     if (!randbit)
-//     {
-//         srand((unsigned)time(0));
-//         for (int i = RAND_MAX; i; i >>= 1, ++randbit);
-//     }
-//     unsigned long long lvalue = 0x4000000000000000L;
-//     int i = 52 - randbit;
-//     for (; i > 0; i -= randbit)
-//         lvalue |= (unsigned long long)rand() << i;
-//     lvalue |= (unsigned long long)rand() >> -i;
-//     return *(double *)&lvalue - 3;
-// }
+static double f64rand()
+{
+    static int randbit = 0;
+    if (!randbit)
+    {
+        srand((unsigned)time(0));
+        for (int i = RAND_MAX; i; i >>= 1, ++randbit);
+    }
+    unsigned long long lvalue = 0x4000000000000000L;
+    int i = 52 - randbit;
+    for (; i > 0; i -= randbit)
+        lvalue |= (unsigned long long)rand() << i;
+    lvalue |= (unsigned long long)rand() >> -i;
+    return *(double *)&lvalue - 3;
+}
+
 void randInitialValues(LeNet *lenet) {
     uint n, m, i, matrixSize;
     Matrix *matrix;
@@ -207,7 +208,7 @@ void randInitialValues(LeNet *lenet) {
             matrix = WEIGHT_GETMATRIX(lenet->weight, n, m);
             matrixSize = MATRIX_SIZE(matrix);
             for(i=0; i<matrixSize; i++){
-                MATRIX_VALUE1(matrix, i) = f32Rand(10);
+                MATRIX_VALUE1(matrix, i) = f64rand();
             }
         }
     }
