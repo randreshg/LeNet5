@@ -60,12 +60,9 @@ void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uin
         //Update parameters
 
         //Free memory
-        printf("---------\nFREE GRADIENT LENET \n");
         freeLenet(&lenetGradient);
-        printf("FREE FEATURES \n");
-        //freeFeatures(&features);
-        printf("FREE FEATURES GRADIENT \n");
-        //freeFeatures(&featuresGradient);
+        freeFeatures(&features);
+        freeFeatures(&featuresGradient);
     }
     
     // double k = ALPHA / batchSize;

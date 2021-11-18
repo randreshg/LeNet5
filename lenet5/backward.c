@@ -43,7 +43,7 @@ void convolution_backward(Feature *input, LeNet lenet, Feature **inputGradient, 
         auxMatrix = FEATURE_GETMATRIX(*inputGradient, 0);
         matrixSize = MATRIX_SIZE(auxMatrix);
         for(wm = 0; wm < matrixSize; wm++)
-            ARRAY_VALUE(lenetGradient->bias, wm) += MATRIX_VALUE1(auxMatrix, wm);
+            ARRAY_VALUE(lenetGradient->bias, wn) += MATRIX_VALUE1(auxMatrix, wm);
     }
     //Update weights
     for(wn = 0; wn < lenet.weight->n; wn++)
@@ -60,30 +60,25 @@ void subsampling_backward(Feature *input, Feature **inputGradient){
     number max, aux;
     const uint ln_length = FEATURE_GETMATRIX(outputGradient, 0)->n / FEATURE_GETMATRIX(*inputGradient, 0)->n,
                lm_length = FEATURE_GETMATRIX(outputGradient, 0)->m / FEATURE_GETMATRIX(*inputGradient, 0)->m;
-    printf("N:%u, M:%u \n", ln_length, lm_length);
-    //MATRIX_VALUE(FEATURE_GETMATRIX(outputGradient, 2), 3, 0) = 100;
     //Input array loop
     for(i = 0; i < (*inputGradient)->n; i++){
-        //inputMatrix = FEATURE_GETMATRIX(input, i);
-        //inputGradientMatrix = FEATURE_GETMATRIX(*inputGradient, i);
+        inputMatrix = FEATURE_GETMATRIX(input, i);
+        inputGradientMatrix = FEATURE_GETMATRIX(*inputGradient, i);
         outputGradientMatrix = FEATURE_GETMATRIX(outputGradient, i);
         //Input matrix loop
-        // for(in = 0; in < inputGradientMatrix->n; in++)
-        // for(im = 0; im < inputGradientMatrix->m; im++){
-        //     //Subsampling
-        //     max = -1.0, aux_n = ln_length*in, aux_m = lm_length*im;
-        //     for(ln = 0; ln < ln_length; ln++){
-        //         for(lm = 0; lm < lm_length; lm++){
-        //             aux = MATRIX_VALUE(inputMatrix, (aux_n + ln), (aux_m + lm));
-        //             if(aux > max)
-        //                 max = aux, maxLn = (aux_n + ln), maxLm = (aux_m + lm);
-        //         }
-        //     }
-        //     MATRIX_VALUE(outputGradientMatrix, maxLn, maxLm) = MATRIX_VALUE(inputGradientMatrix, in, im);
-        // }
-        for(in = 0; in < outputGradientMatrix->n; in++)
-        for(im = 0; im < outputGradientMatrix->m; im++)
-            MATRIX_VALUE(outputGradientMatrix, in, im) = in + im;
+        for(in = 0; in < inputGradientMatrix->n; in++)
+        for(im = 0; im < inputGradientMatrix->m; im++){
+            //Subsampling
+            max = -1.0, aux_n = ln_length*in, aux_m = lm_length*im;
+            for(ln = 0; ln < ln_length; ln++){
+                for(lm = 0; lm < lm_length; lm++){
+                    aux = MATRIX_VALUE(inputMatrix, (aux_n + ln), (aux_m + lm));
+                    if(aux > max)
+                        max = aux, maxLn = (aux_n + ln), maxLm = (aux_m + lm);
+                }
+            }
+            MATRIX_VALUE(outputGradientMatrix, maxLn, maxLm) = MATRIX_VALUE(inputGradientMatrix, in, im);
+        }
     }
 }
 
