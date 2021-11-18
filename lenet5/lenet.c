@@ -14,6 +14,7 @@ void LENET_FREE(LeNet **lenet){
     free(*lenet);
     *lenet = NULL;
 }
+
 // ----- Destructors ----- //
 void freeLenet(LeNet ***lenet){
     LeNet **aux = *lenet;
@@ -32,8 +33,7 @@ void freeFeatures(Feature ***features){
 }
 
 // ----- Training ----- //
-void updateWeight(Weight *weightGradient, Weight *weight, const number factor)
-{
+void updateWeight(Weight *weightGradient, Weight *weight, const number factor) {
     uint w, m, wSize, mSize;
     Matrix *auxMatrix, *auxGradMatrix;
     wSize = WEIGHT_SIZE(weight);
@@ -42,19 +42,17 @@ void updateWeight(Weight *weightGradient, Weight *weight, const number factor)
         auxGradMatrix = WEIGHT_GETMATRIX1(weightGradient, w);
         mSize = MATRIX_SIZE(auxMatrix);
         for(m = 0; m < mSize; m++)
-            MATRIX_VALUE1(auxMatrix, m) = MATRIX_VALUE1(auxMatrix, m) - factor*MATRIX_VALUE1(auxGradMatrix, m);
+            MATRIX_VALUE1(auxMatrix, m) += factor * MATRIX_VALUE1(auxGradMatrix, m);
     }
 }
 
-void updateBias(Array *biasGradient, Array *bias, const number factor)
-{
+void updateBias(Array *biasGradient, Array *bias, const number factor) {
     uint n;
     for(n = 0; n < bias->n; n++)
-        ARRAY_VALUE(bias, n) = ARRAY_VALUE(bias, n) - factor*ARRAY_VALUE(biasGradient, n);
+        ARRAY_VALUE(bias, n) += factor * ARRAY_VALUE(biasGradient, n);
 }
 
-void updateParameters(LeNet **lenetGradient, LeNet **lenet, const number factor)
-{
+void updateParameters(LeNet **lenetGradient, LeNet **lenet, const number factor) {
     uint8 i;
     for(i = 0; i < 4; i++){
         updateWeight(lenetGradient[i]->weight, lenet[i]->weight, factor);
@@ -62,8 +60,7 @@ void updateParameters(LeNet **lenetGradient, LeNet **lenet, const number factor)
     }
 }
 
-void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uint batchSize)
-{
+void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uint batchSize) {
     //Aux variables
     const number alpha = LEARNING_RATE / batchSize;
     uint i;
@@ -92,8 +89,7 @@ void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uin
 }
 
 // ----- Prediction ----- //
-uint8 predict(LeNet **lenet, uint8 *input, uint8 count)
-{
+uint8 predict(LeNet **lenet, uint8 *input, uint8 count) {
     //Features initial values
     Feature **features = FEATURES_INITIAL();
     //Load input
@@ -106,7 +102,7 @@ uint8 predict(LeNet **lenet, uint8 *input, uint8 count)
     return result;
 }
 
-uint8 getResult(Feature *features, uint8 count){
+uint8 getResult(Feature *features, uint8 count) {
     uint8 om, result=-1;
     number max = -1;
     Matrix *output = FEATURE_GETMATRIX(features, 0);
@@ -120,7 +116,7 @@ uint8 getResult(Feature *features, uint8 count){
 }
 
 // ----- Propagation ----- //
-void forwardPropagation(LeNet **lenet, Feature **features){
+void forwardPropagation(LeNet **lenet, Feature **features) {
     convolution_forward(features, *lenet[0]);
     subsampling_forward(features+1);
     convolution_forward(features+2, *lenet[1]);
@@ -139,8 +135,7 @@ void backwardPropagation(LeNet **lenet, Feature **features, LeNet **gradientLene
 }
 
 // ----- Others ----- //
-void loadInput(uint8 *input, Feature *features)
-{
+void loadInput(uint8 *input, Feature *features) {
     //Aux variables
     Matrix *inputMatrix = FEATURE_GETMATRIX(features, 0);
     uint in, im;
@@ -160,7 +155,7 @@ void loadInput(uint8 *input, Feature *features)
 }
 
 // ----- Initial values ----- //
-LeNet **LENET_INITIAL(){
+LeNet **LENET_INITIAL() {
     LeNet **lenet = (LeNet **) malloc(4*sizeof(LeNet *));
     lenet[0] = LENET(INPUT, LAYER1, LENGTH_KERNEL, LENGTH_KERNEL);
     lenet[1] = LENET(LAYER2, LAYER3, LENGTH_KERNEL, LENGTH_KERNEL);
@@ -169,7 +164,7 @@ LeNet **LENET_INITIAL(){
     return lenet;
 }
 
-Feature **FEATURES_INITIAL(){
+Feature **FEATURES_INITIAL() {
     Feature **features = (Feature **) malloc(7*sizeof(Feature *));
     features[0] = FEATURE(INPUT, LENGTH_FEATURE0, LENGTH_FEATURE0);
     features[1] = FEATURE(LAYER1, LENGTH_FEATURE1, LENGTH_FEATURE1);
@@ -181,7 +176,7 @@ Feature **FEATURES_INITIAL(){
     return features;
 }
 
-void setInitialValues(LeNet **lenet){
+void setInitialValues(LeNet **lenet) {
     srand((unsigned int)time(NULL));
     initialValues(lenet[0],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (INPUT + LAYER1))));
     initialValues(lenet[1],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (LAYER2 + LAYER3))));
@@ -189,7 +184,22 @@ void setInitialValues(LeNet **lenet){
     initialValues(lenet[3],  sqrt(6.0 / (LAYER5 + OUTPUT)));
 }
 
-void randInitialValues(LeNet *lenet){
+// static double f64rand()
+// {
+//     static int randbit = 0;
+//     if (!randbit)
+//     {
+//         srand((unsigned)time(0));
+//         for (int i = RAND_MAX; i; i >>= 1, ++randbit);
+//     }
+//     unsigned long long lvalue = 0x4000000000000000L;
+//     int i = 52 - randbit;
+//     for (; i > 0; i -= randbit)
+//         lvalue |= (unsigned long long)rand() << i;
+//     lvalue |= (unsigned long long)rand() >> -i;
+//     return *(double *)&lvalue - 3;
+// }
+void randInitialValues(LeNet *lenet) {
     uint n, m, i, matrixSize;
     Matrix *matrix;
     for(n=0; n<lenet->weight->n; n++){
@@ -197,13 +207,13 @@ void randInitialValues(LeNet *lenet){
             matrix = WEIGHT_GETMATRIX(lenet->weight, n, m);
             matrixSize = MATRIX_SIZE(matrix);
             for(i=0; i<matrixSize; i++){
-                MATRIX_VALUE1(matrix, i) = f32Rand(3);
+                MATRIX_VALUE1(matrix, i) = f32Rand(10);
             }
         }
     }
 }
 
-void initialValues(LeNet *lenet, const number value){
+void initialValues(LeNet *lenet, const number value) {
     uint n, m, i, matrixSize;
     Matrix *matrix;
     randInitialValues(lenet);
