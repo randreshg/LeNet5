@@ -15,7 +15,7 @@ void softMax(Feature *input, uint8 target, Feature *featureGradient){
     number den, inner = 0;
     Matrix *inputMatrix = FEATURE_GETMATRIX(input, 0);
     Matrix *gradientMatrix = FEATURE_GETMATRIX(featureGradient, 0);
-    //Get denominator
+    //Error and softmax
     for(on = 0; on < inputMatrix->m; on++){
         //printf("%2f, ", MATRIX_VALUE1(inputMatrix, on));
         den = 0;
