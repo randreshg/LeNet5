@@ -1,14 +1,15 @@
 #include "lenet.h"
 
 /* ----- BACKWARD FUNCTIONS ----- */
-void activation_backward(Feature *output, number (*action)(number)){
+void activation_backward(Feature *input, Feature *output, number (*action)(number)){
     uint on, om, matrixSize;
-    Matrix *outputMatrix;
+    Matrix *inputMatrix, *outputMatrix;
     for(on = 0; on < output->n; on++){
+        inputMatrix = FEATURE_GETMATRIX(input, on);
         outputMatrix = FEATURE_GETMATRIX(output, on);
         matrixSize = MATRIX_SIZE(outputMatrix);
         for(om = 0; om < matrixSize; om++)
-            MATRIX_VALUE1(outputMatrix, om) *= action(MATRIX_VALUE1(outputMatrix, om));
+            MATRIX_VALUE1(outputMatrix, om) *= action(MATRIX_VALUE1(inputMatrix, om));
     }
 }
 
@@ -36,7 +37,7 @@ void convolution_backward(Feature *input, LeNet lenet, Feature **inputGradient, 
         convolute_backward(FEATURE_GETMATRIX(*inputGradient, wm), WEIGHT_GETMATRIX(lenet.weight, wn, wm), 
                            FEATURE_GETMATRIX(outputGradient, wn));
     //Activation function
-    activation_backward(outputGradient, ReLU_GRAD);
+    activation_backward(input, outputGradient, ReLU_GRAD);
     //Update bias
     Matrix *auxMatrix;
     for(wn = 0; wn < (*inputGradient)->n; wn++){
@@ -103,7 +104,7 @@ void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, L
         }
     }
     //Activation function
-    activation_backward(outputGradient, ReLU_GRAD);
+    activation_backward(input, outputGradient, ReLU_GRAD);
     //Update bias
     for(wm = 0; wm < (lenetGradient->bias)->n; wm++)
         ARRAY_VALUE(lenetGradient->bias, wm) += MATRIX_VALUE1(inputGradientMatrix, wm);

@@ -33,7 +33,7 @@ void freeFeatures(Feature ***features){
 }
 
 // ----- Training ----- //
-void updateWeight(Weight *weightGradient, Weight *weight, const number factor) {
+void updateWeight(const number factor, Weight *weightGradient, Weight *weight) {
     uint w, m, wSize, mSize;
     Matrix *auxMatrix, *auxGradMatrix;
     wSize = WEIGHT_SIZE(weight);
@@ -46,27 +46,26 @@ void updateWeight(Weight *weightGradient, Weight *weight, const number factor) {
     }
 }
 
-void updateBias(Array *biasGradient, Array *bias, const number factor) {
+void updateBias(const number factor, Array *biasGradient, Array *bias) {
     uint n;
     for(n = 0; n < bias->n; n++)
         ARRAY_VALUE(bias, n) += factor * ARRAY_VALUE(biasGradient, n);
 }
 
-void updateParameters(LeNet **lenetGradient, LeNet **lenet, const number factor) {
+void updateParameters(const number factor, LeNet **lenetGradient, LeNet **lenet) {
     uint8 i;
     for(i = 0; i < 4; i++){
-        updateWeight(lenetGradient[i]->weight, lenet[i]->weight, factor);
-        updateBias(lenetGradient[i]->bias, lenet[i]->bias, factor);
+        updateWeight(factor, lenetGradient[i]->weight, lenet[i]->weight);
+        updateBias(factor, lenetGradient[i]->bias, lenet[i]->bias);
     }
 }
 
 void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uint batchSize) {
     //Aux variables
     const number alpha = LEARNING_RATE / batchSize;
-    uint i;
-    LeNet **buffer, **lenetGradient;
+    LeNet **lenetGradient, **buffer = LENET_INITIAL();
     Feature **features, **featuresGradient;
-    for (i = 0; i < batchSize; i++) {
+    for (uint i = 0; i < batchSize; i++) {
         //Malloc memory
         lenetGradient = LENET_INITIAL();
         features = FEATURES_INITIAL();
@@ -80,13 +79,14 @@ void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uin
         //Backward
         backwardPropagation(lenet, features, lenetGradient, featuresGradient);
         //Update parameters
-        updateParameters(lenetGradient, lenet, alpha);
+        updateParameters(1, lenetGradient, buffer);
         //Free memory
         freeLenet(&lenetGradient);
         freeFeatures(&features);
         freeFeatures(&featuresGradient);
     }
-    updateParameters(buffer, lenet, alpha);
+    updateParameters(alpha, buffer, lenet);
+    freeLenet(&buffer);
 }
 
 // ----- Prediction ----- //

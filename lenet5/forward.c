@@ -83,5 +83,7 @@ void dotproduct_forward(Feature **input, LeNet lenet){
             MATRIX_VALUE1(outputMatrix, wm) += MATRIX_VALUE1(inputMatrix, wn2) * MATRIX_VALUE(weightMatrix, wn1_aux + wn2, wm);
     }
     //Activation function
-    activation_forward(output, lenet.bias, ReLU);
+    //activation_forward(output, lenet.bias, ReLU);
+    for(wm = 0; wm < lenet.bias->n; wm++)
+        MATRIX_VALUE1(outputMatrix, wm) = ReLU(MATRIX_VALUE1(outputMatrix, wm) + ARRAY_VALUE(lenet.bias, wm));
 }

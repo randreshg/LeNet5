@@ -36,9 +36,9 @@ extern void freeLenet(LeNet ***lenet);
 extern void freeFeatures(Feature ***features);
 /* ----- FUNCTIONS ----- */
 //Training
-extern void updateWeight(Weight *weightGradient, Weight *weight, const number factor);
-extern void updateBias(Array *biasGradient, Array *bias, const number factor);
-extern void updateParameters(LeNet **lenetGradient, LeNet **lenet, const number factor);
+extern void updateWeight(const number factor, Weight *weightGradient, Weight *weight);
+extern void updateBias(const number factor, Array *biasGradient, Array *bias);
+extern void updateParameters(const number factor, LeNet **lenetGradient, LeNet **lenet);
 extern void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uint batchSize);
 //Prediction
 extern uint8 predict(LeNet **lenet, uint8 *input, uint8 count);
@@ -63,7 +63,7 @@ extern void subsampling_forward(Feature **input);
 extern void dotproduct_forward(Feature **input, LeNet lenet);
 
 /* ----- BACKWARD ----- */
-extern void activation_backward(Feature *output, number (*action)(number));
+extern void activation_backward(Feature *input, Feature *output, number (*action)(number));
 extern void convolute_backward(Matrix *input, Matrix *weight, Matrix *output);
 extern void convolution_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *lenetGradient);
 extern void subsampling_backward(Feature *input, Feature **inputGradient);
