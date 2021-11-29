@@ -7,9 +7,9 @@
 //Features
 #define LENGTH_FEATURE0 32
 #define LENGTH_FEATURE1 (LENGTH_FEATURE0 - LENGTH_KERNEL + 1)
-#define LENGTH_FEATURE2 (LENGTH_FEATURE1 / 2)
+#define LENGTH_FEATURE2 (LENGTH_FEATURE1 >> 1)
 #define LENGTH_FEATURE3 (LENGTH_FEATURE2 - LENGTH_KERNEL + 1)
-#define	LENGTH_FEATURE4 (LENGTH_FEATURE3 / 2)
+#define	LENGTH_FEATURE4 (LENGTH_FEATURE3 >> 1)
 #define LENGTH_FEATURE5 (LENGTH_FEATURE4 - LENGTH_KERNEL + 1)
 //Layer
 #define LAYERS          6
@@ -41,8 +41,8 @@ extern void updateBias(const number factor, Array *biasGradient, Array *bias);
 extern void updateParameters(const number factor, LeNet **lenetGradient, LeNet **lenet);
 extern void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uint batchSize);
 //Prediction
-extern uint8 predict(LeNet **lenet, uint8 *input, uint8 count);
-extern uint8 getResult(Feature *features, uint8 count);
+extern uint8 predict(LeNet **lenet, uint8 *input);
+extern uint8 getResult(Feature *features);
 //Propagation
 extern void forwardPropagation(LeNet **lenet, Feature **features);
 extern void backwardPropagation(LeNet **lenet, Feature **features, LeNet **lenetGradient, Feature **featuresGradient);

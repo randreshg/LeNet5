@@ -23,7 +23,7 @@ struct array
     uint n;
     number *p;
 };
-#define ARRAY_VALUE(ar, n) *((ar)->p + (n))
+#define ARRAY_VALUE(ar, n) (*((ar)->p + (n)))
 extern void ARRAY_FREE(Array **ar);
 extern Array *ARRAY(uint n);
 

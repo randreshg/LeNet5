@@ -1,24 +1,24 @@
 #include "lenet.h"
 
 /* ----- BACKWARD FUNCTIONS ----- */
-void activation_backward(Feature *input, Feature *output, number (*action)(number)){
+void activation_backward(Feature *input, Feature *output, number (*action)(number)) {
     uint on, om, matrixSize;
     Matrix *inputMatrix, *outputMatrix;
-    for(on = 0; on < output->n; on++){
-        inputMatrix = FEATURE_GETMATRIX(input, on);
+    for(on = 0; on < output->n; on++) {
         outputMatrix = FEATURE_GETMATRIX(output, on);
-        matrixSize = MATRIX_SIZE(outputMatrix);
+        inputMatrix = FEATURE_GETMATRIX(input, on);
+        matrixSize = MATRIX_SIZE(inputMatrix);
         for(om = 0; om < matrixSize; om++)
             MATRIX_VALUE1(outputMatrix, om) *= action(MATRIX_VALUE1(inputMatrix, om));
     }
 }
 
-void convolute_backward(Matrix *input, Matrix *weight, Matrix *output ){
+void convolute_backward(Matrix *input, Matrix *weight, Matrix *output ) {
     //Aux variables
     uint in, im, wn, wm;
     //Input loop
     for(in = 0; in < input->n; in++)
-    for(im = 0; im < input->m; im++){
+    for(im = 0; im < input->m; im++) {
         //Weight matrix loop
         for(wn = 0; wn < weight->n; wn++)
         for(wm = 0; wm < weight->m; wm++)
@@ -27,7 +27,7 @@ void convolute_backward(Matrix *input, Matrix *weight, Matrix *output ){
     }
 }
 
-void convolution_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *lenetGradient){
+void convolution_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *lenetGradient) {
     Feature *outputGradient = *(inputGradient - 1);
     //Aux variables
     uint wn, wm, matrixSize;
@@ -40,7 +40,7 @@ void convolution_backward(Feature *input, LeNet lenet, Feature **inputGradient, 
     activation_backward(input, outputGradient, ReLU_GRAD);
     //Update bias
     Matrix *auxMatrix;
-    for(wn = 0; wn < (*inputGradient)->n; wn++){
+    for(wn = 0; wn < (*inputGradient)->n; wn++) {
         auxMatrix = FEATURE_GETMATRIX(*inputGradient, wn);
         matrixSize = MATRIX_SIZE(auxMatrix);
         for(wm = 0; wm < matrixSize; wm++)
@@ -53,7 +53,7 @@ void convolution_backward(Feature *input, LeNet lenet, Feature **inputGradient, 
                           WEIGHT_GETMATRIX(lenetGradient->weight, wn, wm));
 }
 
-void subsampling_backward(Feature *input, Feature **inputGradient){
+void subsampling_backward(Feature *input, Feature **inputGradient) {
     Feature *outputGradient = *(inputGradient - 1);
     //Aux variables
     Matrix *inputMatrix, *inputGradientMatrix, *outputGradientMatrix;
@@ -83,24 +83,24 @@ void subsampling_backward(Feature *input, Feature **inputGradient){
     }
 }
 
-void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *lenetGradient){
+void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *lenetGradient) {
     Feature *outputGradient = *(inputGradient - 1);
     //Aux variables
     uint wn1, wn2, wm, wn1_aux;
     Matrix *auxMatrix;
-    Matrix *weightMatrix = WEIGHT_GETMATRIX1(lenet.weight, 0);
-    Matrix *weightGradientMatrix = WEIGHT_GETMATRIX1(lenetGradient->weight, 0);
-    Matrix *inputGradientMatrix = FEATURE_GETMATRIX(*inputGradient, 0);
+    Matrix *weightMatrix = WEIGHT_GETMATRIX1(lenet.weight, 0), 
+           *weightGradientMatrix = WEIGHT_GETMATRIX1(lenetGradient->weight, 0),
+           *inputGradientMatrix = FEATURE_GETMATRIX(*inputGradient, 0);
     //Constants
     const uint wn1_length = outputGradient->n, wn2_length = (weightMatrix->n)/wn1_length;
     //Dot product + activation function
-    for(wn1 = 0; wn1 < wn1_length; wn1++){
+    for(wn1 = 0; wn1 < wn1_length; wn1++) {
         auxMatrix = FEATURE_GETMATRIX(outputGradient, wn1);
-        wn1_aux = wn1 * wn2_length;
-        for(wn2 = 0; wn2 < wn2_length; wn2++){
+        wn1_aux = wn1*wn2_length;
+        for(wn2 = 0; wn2 < wn2_length; wn2++) {
             //Dot product
             for(wm = 0; wm < weightMatrix->m; wm++)
-                MATRIX_VALUE1(auxMatrix, wn2) += MATRIX_VALUE1(inputGradientMatrix, wm) * MATRIX_VALUE(weightMatrix, wn1_aux + wn2, wm);
+                MATRIX_VALUE1(auxMatrix, wn2) += MATRIX_VALUE1(inputGradientMatrix, wm) * MATRIX_VALUE(weightMatrix, (wn1_aux + wn2), wm);
         }
     }
     //Activation function
@@ -110,12 +110,12 @@ void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, L
         ARRAY_VALUE(lenetGradient->bias, wm) += MATRIX_VALUE1(inputGradientMatrix, wm);
     //Update weights
     auxMatrix = FEATURE_GETMATRIX(input, 0);
-    for(wn1 = 0; wn1 < wn1_length; wn1++){
-        wn1_aux = wn1 * wn2_length;
-        for(wn2 = 0; wn2 < wn2_length; wn2++){
+    for(wn1 = 0; wn1 < wn1_length; wn1++) {
+        wn1_aux = wn1*wn2_length;
+        for(wn2 = 0; wn2 < wn2_length; wn2++) {
             //Dot product
             for(wm = 0; wm < weightMatrix->m; wm++)
-                MATRIX_VALUE(weightGradientMatrix, wn1_aux + wn2, wm) += MATRIX_VALUE1(auxMatrix, wn2) * MATRIX_VALUE1(inputGradientMatrix, wm);
+                MATRIX_VALUE(weightGradientMatrix, (wn1_aux + wn2), wm) += MATRIX_VALUE1(auxMatrix, wn2) * MATRIX_VALUE1(inputGradientMatrix, wm);
         }
     }
 }

@@ -1,14 +1,13 @@
 //gcc -o main main.c lenet5/lenet.c lenet5/backward.c lenet5/forward.c lenet5/others.c
 #include "lenet5/lenet.h"
 
-uint testing(LeNet **lenet, uint8 testImage[][IMG_SIZE], uint8 *testLabel, uint total_size)
-{
+uint testing(LeNet **lenet, uint8 testImage[][IMG_SIZE], uint8 *testLabel, uint total_size) {
     printf("--------\n");
     printf("TESTING\n");
     uint rightPredictions=0, percent=0, i;
     uint8 prediction;
     for (i=0; i<total_size; i++){
-        prediction = predict(lenet, testImage[i], 10);
+        prediction = predict(lenet, testImage[i]);
         //printf("TARGET:%u - PREDICTION:%u\n", testLabel[i], prediction);
         rightPredictions += (testLabel[i] == prediction);
         if (i * 100 / total_size > percent)
@@ -17,8 +16,7 @@ uint testing(LeNet **lenet, uint8 testImage[][IMG_SIZE], uint8 *testLabel, uint 
     return rightPredictions;
 }
 
-void training(LeNet **lenet, const uint batchSize, const uint totalSize)
-{
+void training(LeNet **lenet, const uint batchSize, const uint totalSize) {
     printf("--------\n");
     printf("TRAINING\n");
     setInitialValues(lenet);
@@ -32,8 +30,7 @@ void training(LeNet **lenet, const uint batchSize, const uint totalSize)
     }
 }
 
-int main()
-{
+int main() {
     //Malloc 
     LeNet **lenet = LENET_INITIAL();
     printf("-------------------\n");
@@ -57,7 +54,6 @@ int main()
     printf("-------------------\n");
     printf("FREE LENET MEMORY\n");
     freeLenet(&lenet);
-    //
     return 0;
 }
 
