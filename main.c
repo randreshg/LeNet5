@@ -45,8 +45,10 @@ int main() {
     //Process starts
     clock_t start = clock();
     if(train)
-        training(lenet, 300, NUM_TRAIN);
-    uint rightPredictions = testing(lenet, testImage, testLabel, NUM_TEST);
+        training(lenet, 300, 1);
+    else
+        setInitialValues(lenet);
+    uint rightPredictions = testing(lenet, testImage, testLabel, 1);
     //Process ends
     printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
     printf("Time: %u\n", (unsigned)(clock() - start));
