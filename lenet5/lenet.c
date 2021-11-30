@@ -1,14 +1,14 @@
 #include "lenet.h"
 
 // ----- Constructor ----- //
-LeNet *LENET(const uint n, const uint m, const uint wm_n, const uint wm_m){
+LeNet *LENET(const uint n, const uint m, const uint wm_n, const uint wm_m, const uint bi_n) {
     LeNet *le = (LeNet *)malloc(sizeof(LeNet));
     le->weight = WEIGHT(n, m, wm_n, wm_m);
-    le->bias = ARRAY(m);
+    le->bias = ARRAY(bi_n);
     return le;
 }
 
-void LENET_FREE(LeNet **lenet){
+void LENET_FREE(LeNet **lenet) {
     WEIGHT_FREE(&((*lenet)->weight));
     ARRAY_FREE(&((*lenet)->bias));
     free(*lenet);
@@ -16,7 +16,7 @@ void LENET_FREE(LeNet **lenet){
 }
 
 // ----- Destructors ----- //
-void freeLenet(LeNet ***lenet){
+void freeLenet(LeNet ***lenet) {
     LeNet **aux = *lenet;
     for(uint8 i = 0; i < 4; i++)
         LENET_FREE(aux + i);
@@ -24,7 +24,7 @@ void freeLenet(LeNet ***lenet){
     aux = NULL;
 }
 
-void freeFeatures(Feature ***features){
+void freeFeatures(Feature ***features) {
     Feature **aux = *features;
     for(uint8 i = 0; i < 7; i++)
         FEATURE_FREE(aux + i);
@@ -72,8 +72,8 @@ void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uin
         loadInput(input[i], *features);
         forwardPropagation(lenet, features);
         softMax(features[6], labels[i], featuresGradient[6]);
-        backwardPropagation(lenet, features, lenetGradient, featuresGradient);
-        updateParameters(1, lenetGradient, buffer);
+        //backwardPropagation(lenet, features, lenetGradient, featuresGradient);
+        //updateParameters(1, lenetGradient, buffer);
         //Free memory
         freeLenet(&lenetGradient);
         freeFeatures(&features);
@@ -152,10 +152,10 @@ void loadInput(uint8 *input, Feature *features) {
 // ----- Initial values ----- //
 LeNet **LENET_INITIAL() {
     LeNet **lenet = (LeNet **) malloc(4 * sizeof(LeNet *));
-    lenet[0] = LENET(INPUT, LAYER1, LENGTH_KERNEL, LENGTH_KERNEL);
-    lenet[1] = LENET(LAYER2, LAYER3, LENGTH_KERNEL, LENGTH_KERNEL);
-    lenet[2] = LENET(LAYER4, LAYER5, LENGTH_KERNEL, LENGTH_KERNEL);
-    lenet[3] = LENET(1, 1, LAYER5 * LENGTH_FEATURE5 * LENGTH_FEATURE5, OUTPUT);
+    lenet[0] = LENET(INPUT, LAYER1, LENGTH_KERNEL, LENGTH_KERNEL, LAYER1);
+    lenet[1] = LENET(LAYER2, LAYER3, LENGTH_KERNEL, LENGTH_KERNEL, LAYER3);
+    lenet[2] = LENET(LAYER4, LAYER5, LENGTH_KERNEL, LENGTH_KERNEL, LAYERS);
+    lenet[3] = LENET(1, 1, LAYER5 * LENGTH_FEATURE5 * LENGTH_FEATURE5, OUTPUT, OUTPUT);
     return lenet;
 }
 
@@ -205,7 +205,6 @@ void setInitialValues(LeNet **lenet) {
     uint wn, wm, on, om;
     Matrix *auxMatrix;
     Weight *weight;
-    Array *bias;
     //Copy weight0_1
     weight = lenet[0]->weight;
     for(wn = 0; wn < weight->n; wn++)
@@ -235,29 +234,11 @@ void setInitialValues(LeNet **lenet) {
     }
     //Copy weight5_6
     weight = lenet[3]->weight;
-    for(wn = 0; wn < weight->n; wn++)
-    for(wm = 0; wm < weight->m; wm++) {
-        auxMatrix = WEIGHT_GETMATRIX(weight, wn, wm);
-        for(on = 0; on < auxMatrix->n; on++)
-        for(om = 0; om < auxMatrix->m; om++)
-            MATRIX_VALUE(auxMatrix, on, om) = lenet5->weight5_6[on][om];
-    }
-    //Copy bias0_1
-    bias = lenet[0]->bias;
-    for(wn = 0; wn < bias->n; wn++)
-        ARRAY_VALUE(bias, wn) = lenet5->bias0_1[wn];
-    //Copy bias2_3
-    bias = lenet[1]->bias;
-    for(wn = 0; wn < bias->n; wn++)
-        ARRAY_VALUE(bias, wn) = lenet5->bias2_3[wn];
-    //Copy bias4_5
-    bias = lenet[2]->bias;
-    for(wn = 0; wn < bias->n; wn++)
-        ARRAY_VALUE(bias, wn) = lenet5->bias4_5[wn];
-    //Copy bias5_6
-    bias = lenet[3]->bias;
-    for(wn = 0; wn < bias->n; wn++)
-        ARRAY_VALUE(bias, wn) = lenet5->bias5_6[wn];
+    auxMatrix = WEIGHT_GETMATRIX1(weight, 0);
+    for(on = 0; on < auxMatrix->n; on++)
+    for(om = 0; om < auxMatrix->m; om++)
+        MATRIX_VALUE(auxMatrix, on, om) = lenet5->weight5_6[on][om];
+    
     // initialValues(lenet[0],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (INPUT + LAYER1))));
     // initialValues(lenet[1],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (LAYER2 + LAYER3))));
     // initialValues(lenet[2],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (LAYER4 + LAYER5))));

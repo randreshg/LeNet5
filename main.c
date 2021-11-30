@@ -23,7 +23,7 @@ void training(LeNet **lenet, const uint batchSize, const uint totalSize) {
     static uint8 trainImage[NUM_TRAIN][IMG_SIZE];
     static uint8 trainLabel[NUM_TRAIN];
     load_trainingData(trainImage, trainLabel);
-    for (uint i = 0, percent = 0; i <= totalSize; i += batchSize) {
+    for (uint i = 0, percent = 0; i < totalSize; i += batchSize) {
         trainBatch(lenet, trainImage + i, trainLabel + i, batchSize);
         if (i * 100 / totalSize > percent)
             printf("Train:%2d%%\n", percent = i * 100 / totalSize);
@@ -45,12 +45,12 @@ int main() {
     //Process starts
     clock_t start = clock();
     if(train)
-        training(lenet, 300, 1);
+        training(lenet, 1, 1);
     else
         setInitialValues(lenet);
-    uint rightPredictions = testing(lenet, testImage, testLabel, 1);
-    //Process ends
-    printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
+    // uint rightPredictions = testing(lenet, testImage, testLabel, 1);
+    // //Process ends
+    // printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
     printf("Time: %u\n", (unsigned)(clock() - start));
     //Free
     printf("-------------------\n");

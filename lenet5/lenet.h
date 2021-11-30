@@ -29,7 +29,7 @@ typedef struct
 } LeNet;
 
 /* ----- CONSTRUCTOR ----- */
-extern LeNet *LENET(uint n, uint m, uint wm_n, uint wm_m);
+extern LeNet *LENET(const uint n, const uint m, const uint wm_n, const uint wm_m, const uint bi_n);
 extern void LENET_FREE(LeNet **lenet);
 
 extern void freeLenet(LeNet ***lenet);
