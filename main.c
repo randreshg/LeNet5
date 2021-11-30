@@ -41,7 +41,8 @@ int main() {
     static uint8 testImage[NUM_TEST][IMG_SIZE]; 
     static uint8 testLabel[NUM_TEST];
     load_testData(testImage, testLabel);
-
+    
+  
     //Process starts
     clock_t start = clock();
     if(train)

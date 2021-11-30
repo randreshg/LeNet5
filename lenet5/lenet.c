@@ -172,73 +172,8 @@ Feature **FEATURES_INITIAL() {
 }
 
 //-------------------------------------------------------
-#define LENET_FILE 		"model.dat"
-#define LENET_FILE1 	"model1.dat"
-typedef struct LeNet5
-{
-    double weight0_1[INPUT][LAYER1][LENGTH_KERNEL][LENGTH_KERNEL];
-    double weight2_3[LAYER2][LAYER3][LENGTH_KERNEL][LENGTH_KERNEL];
-    double weight4_5[LAYER4][LAYER5][LENGTH_KERNEL][LENGTH_KERNEL];
-    double weight5_6[LAYER5 * LENGTH_FEATURE5 * LENGTH_FEATURE5][OUTPUT];
-
-    double bias0_1[LAYER1];
-    double bias2_3[LAYER3];
-    double bias4_5[LAYER5];
-    double bias5_6[OUTPUT];
-
-}LeNet5;
-int load(LeNet5 *lenet, char filename[])
-{
-    FILE *fp = fopen(filename, "rb");
-    if (!fp) return 1;
-    fread(lenet, sizeof(LeNet5), 1, fp);
-    fclose(fp);
-    printf("OK \n");
-    return 0;
-}
-
-//-------------------------------------------------------
 void setInitialValues(LeNet **lenet) {
-    // LeNet5 *lenet5 = (LeNet5 *)malloc(sizeof(LeNet5));
-    // load(lenet5, LENET_FILE1);
-    // //Aux variables
-    // uint wn, wm, on, om;
-    // Matrix *auxMatrix;
-    // Weight *weight;
-    // //Copy weight0_1
-    // weight = lenet[0]->weight;
-    // for(wn = 0; wn < weight->n; wn++)
-    // for(wm = 0; wm < weight->m; wm++) {
-    //     auxMatrix = WEIGHT_GETMATRIX(weight, wn, wm);
-    //     for(on = 0; on < auxMatrix->n; on++)
-    //     for(om = 0; om < auxMatrix->m; om++)
-    //         MATRIX_VALUE(auxMatrix, on, om) = lenet5->weight0_1[wn][wm][on][om];
-    // }
-    // //Copy weight2_3
-    // weight = lenet[1]->weight;
-    // for(wn = 0; wn < weight->n; wn++)
-    // for(wm = 0; wm < weight->m; wm++) {
-    //     auxMatrix = WEIGHT_GETMATRIX(weight, wn, wm);
-    //     for(on = 0; on < auxMatrix->n; on++)
-    //     for(om = 0; om < auxMatrix->m; om++)
-    //         MATRIX_VALUE(auxMatrix, on, om) = lenet5->weight2_3[wn][wm][on][om];
-    // }
-    // //Copy weight4_5
-    // weight = lenet[2]->weight;
-    // for(wn = 0; wn < weight->n; wn++)
-    // for(wm = 0; wm < weight->m; wm++) {
-    //     auxMatrix = WEIGHT_GETMATRIX(weight, wn, wm);
-    //     for(on = 0; on < auxMatrix->n; on++)
-    //     for(om = 0; om < auxMatrix->m; om++)
-    //         MATRIX_VALUE(auxMatrix, on, om) = lenet5->weight4_5[wn][wm][on][om];
-    // }
-    // //Copy weight5_6
-    // weight = lenet[3]->weight;
-    // auxMatrix = WEIGHT_GETMATRIX1(weight, 0);
-    // for(on = 0; on < auxMatrix->n; on++)
-    // for(om = 0; om < auxMatrix->m; om++)
-    //     MATRIX_VALUE(auxMatrix, on, om) = lenet5->weight5_6[on][om];
-    //free(lenet5);
+    srand(time(0));
     initialValues(lenet[0],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (INPUT + LAYER1))));
     initialValues(lenet[1],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (LAYER2 + LAYER3))));
     initialValues(lenet[2],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (LAYER4 + LAYER5))));

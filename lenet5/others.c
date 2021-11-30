@@ -12,10 +12,18 @@ number ReLU_GRAD(number x) {
 void softMax(Feature *input, uint8 target, Feature *featureGradient) {
     //Aux variables
     uint8 on, om;
-    number den, inner = 0;
+    number den = 0, inner = 0;
     Matrix *inputMatrix = FEATURE_GETMATRIX(input, 0);
     Matrix *gradientMatrix = FEATURE_GETMATRIX(featureGradient, 0);
     //Error and softmax
+    //Softmax
+    // for(om = 0; om < inputMatrix->m; om++) {
+    //     MATRIX_VALUE1(inputMatrix, om) = exp(MATRIX_VALUE1(inputMatrix, om));
+    //     den += MATRIX_VALUE1(inputMatrix, om);
+    // }
+    // for(om = 0; om < inputMatrix->m; om++) 
+    //     ARRAY_VALUE(gradientMatrix, om) = MATRIX_VALUE1(inputMatrix, om) / den;
+    // ARRAY_VALUE(gradientMatrix, target) = 1-ARRAY_VALUE(gradientMatrix, target);
     for(on = 0; on < inputMatrix->m; on++) {
         den = 0;
         for(om = 0; om < inputMatrix->m; om++)
