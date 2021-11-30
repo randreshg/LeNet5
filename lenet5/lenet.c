@@ -72,8 +72,8 @@ void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uin
         loadInput(input[i], *features);
         forwardPropagation(lenet, features);
         softMax(features[6], labels[i], featuresGradient[6]);
-        //backwardPropagation(lenet, features, lenetGradient, featuresGradient);
-        //updateParameters(1, lenetGradient, buffer);
+        backwardPropagation(lenet, features, lenetGradient, featuresGradient);
+        updateParameters(1, lenetGradient, buffer);
         //Free memory
         freeLenet(&lenetGradient);
         freeFeatures(&features);
@@ -120,7 +120,7 @@ void forwardPropagation(LeNet **lenet, Feature **features) {
     dotproduct_forward (features + 5, *lenet[3]);
 }
 
-void backwardPropagation(LeNet **lenet, Feature **features, LeNet **lenetGradient, Feature **featuresGradient){
+void backwardPropagation(LeNet **lenet, Feature **features, LeNet **lenetGradient, Feature **featuresGradient) {
     dotproduct_backward (features[5], *lenet[3], featuresGradient + 6, lenetGradient[3]);
     convolution_backward(features[4], *lenet[2], featuresGradient + 5, lenetGradient[2]);
     subsampling_backward(features[3], featuresGradient + 4);
@@ -154,7 +154,7 @@ LeNet **LENET_INITIAL() {
     LeNet **lenet = (LeNet **) malloc(4 * sizeof(LeNet *));
     lenet[0] = LENET(INPUT, LAYER1, LENGTH_KERNEL, LENGTH_KERNEL, LAYER1);
     lenet[1] = LENET(LAYER2, LAYER3, LENGTH_KERNEL, LENGTH_KERNEL, LAYER3);
-    lenet[2] = LENET(LAYER4, LAYER5, LENGTH_KERNEL, LENGTH_KERNEL, LAYERS);
+    lenet[2] = LENET(LAYER4, LAYER5, LENGTH_KERNEL, LENGTH_KERNEL, LAYER5);
     lenet[3] = LENET(1, 1, LAYER5 * LENGTH_FEATURE5 * LENGTH_FEATURE5, OUTPUT, OUTPUT);
     return lenet;
 }
@@ -199,66 +199,50 @@ int load(LeNet5 *lenet, char filename[])
 
 //-------------------------------------------------------
 void setInitialValues(LeNet **lenet) {
-    LeNet5 *lenet5 = (LeNet5 *)malloc(sizeof(LeNet5));
-    load(lenet5, LENET_FILE1);
-    //Aux variables
-    uint wn, wm, on, om;
-    Matrix *auxMatrix;
-    Weight *weight;
-    //Copy weight0_1
-    weight = lenet[0]->weight;
-    for(wn = 0; wn < weight->n; wn++)
-    for(wm = 0; wm < weight->m; wm++) {
-        auxMatrix = WEIGHT_GETMATRIX(weight, wn, wm);
-        for(on = 0; on < auxMatrix->n; on++)
-        for(om = 0; om < auxMatrix->m; om++)
-            MATRIX_VALUE(auxMatrix, on, om) = lenet5->weight0_1[wn][wm][on][om];
-    }
-    //Copy weight2_3
-    weight = lenet[1]->weight;
-    for(wn = 0; wn < weight->n; wn++)
-    for(wm = 0; wm < weight->m; wm++) {
-        auxMatrix = WEIGHT_GETMATRIX(weight, wn, wm);
-        for(on = 0; on < auxMatrix->n; on++)
-        for(om = 0; om < auxMatrix->m; om++)
-            MATRIX_VALUE(auxMatrix, on, om) = lenet5->weight2_3[wn][wm][on][om];
-    }
-    //Copy weight4_5
-    weight = lenet[2]->weight;
-    for(wn = 0; wn < weight->n; wn++)
-    for(wm = 0; wm < weight->m; wm++) {
-        auxMatrix = WEIGHT_GETMATRIX(weight, wn, wm);
-        for(on = 0; on < auxMatrix->n; on++)
-        for(om = 0; om < auxMatrix->m; om++)
-            MATRIX_VALUE(auxMatrix, on, om) = lenet5->weight4_5[wn][wm][on][om];
-    }
-    //Copy weight5_6
-    weight = lenet[3]->weight;
-    auxMatrix = WEIGHT_GETMATRIX1(weight, 0);
-    for(on = 0; on < auxMatrix->n; on++)
-    for(om = 0; om < auxMatrix->m; om++)
-        MATRIX_VALUE(auxMatrix, on, om) = lenet5->weight5_6[on][om];
-    
-    // initialValues(lenet[0],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (INPUT + LAYER1))));
-    // initialValues(lenet[1],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (LAYER2 + LAYER3))));
-    // initialValues(lenet[2],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (LAYER4 + LAYER5))));
-    // initialValues(lenet[3],  sqrt(6.0 / (LAYER5 + OUTPUT)));
-    free(lenet5);
-    printf("DATA INITIALIZED \n");
-}
-
-static double f64rand() {
-    static int randbit = 0;
-    if (!randbit) {
-        srand((unsigned)time(0));
-        for (int i = RAND_MAX; i; i >>= 1, ++randbit);
-    }
-    unsigned long long lvalue = 0x4000000000000000L;
-    int i = 52 - randbit;
-    for (; i > 0; i -= randbit)
-        lvalue |= (unsigned long long)rand() << i;
-    lvalue |= (unsigned long long)rand() >> -i;
-    return *(double *)&lvalue - 3;
+    // LeNet5 *lenet5 = (LeNet5 *)malloc(sizeof(LeNet5));
+    // load(lenet5, LENET_FILE1);
+    // //Aux variables
+    // uint wn, wm, on, om;
+    // Matrix *auxMatrix;
+    // Weight *weight;
+    // //Copy weight0_1
+    // weight = lenet[0]->weight;
+    // for(wn = 0; wn < weight->n; wn++)
+    // for(wm = 0; wm < weight->m; wm++) {
+    //     auxMatrix = WEIGHT_GETMATRIX(weight, wn, wm);
+    //     for(on = 0; on < auxMatrix->n; on++)
+    //     for(om = 0; om < auxMatrix->m; om++)
+    //         MATRIX_VALUE(auxMatrix, on, om) = lenet5->weight0_1[wn][wm][on][om];
+    // }
+    // //Copy weight2_3
+    // weight = lenet[1]->weight;
+    // for(wn = 0; wn < weight->n; wn++)
+    // for(wm = 0; wm < weight->m; wm++) {
+    //     auxMatrix = WEIGHT_GETMATRIX(weight, wn, wm);
+    //     for(on = 0; on < auxMatrix->n; on++)
+    //     for(om = 0; om < auxMatrix->m; om++)
+    //         MATRIX_VALUE(auxMatrix, on, om) = lenet5->weight2_3[wn][wm][on][om];
+    // }
+    // //Copy weight4_5
+    // weight = lenet[2]->weight;
+    // for(wn = 0; wn < weight->n; wn++)
+    // for(wm = 0; wm < weight->m; wm++) {
+    //     auxMatrix = WEIGHT_GETMATRIX(weight, wn, wm);
+    //     for(on = 0; on < auxMatrix->n; on++)
+    //     for(om = 0; om < auxMatrix->m; om++)
+    //         MATRIX_VALUE(auxMatrix, on, om) = lenet5->weight4_5[wn][wm][on][om];
+    // }
+    // //Copy weight5_6
+    // weight = lenet[3]->weight;
+    // auxMatrix = WEIGHT_GETMATRIX1(weight, 0);
+    // for(on = 0; on < auxMatrix->n; on++)
+    // for(om = 0; om < auxMatrix->m; om++)
+    //     MATRIX_VALUE(auxMatrix, on, om) = lenet5->weight5_6[on][om];
+    //free(lenet5);
+    initialValues(lenet[0],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (INPUT + LAYER1))));
+    initialValues(lenet[1],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (LAYER2 + LAYER3))));
+    initialValues(lenet[2],  sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (LAYER4 + LAYER5))));
+    initialValues(lenet[3],  sqrt(6.0 / (LAYER5 + OUTPUT)));
 }
 
 void randInitialValues(LeNet *lenet) {
@@ -269,7 +253,7 @@ void randInitialValues(LeNet *lenet) {
             matrix = WEIGHT_GETMATRIX(lenet->weight, n, m);
             matrixSize = MATRIX_SIZE(matrix);
             for(i = 0; i < matrixSize; i++)
-                MATRIX_VALUE1(matrix, i) = f64rand();
+                MATRIX_VALUE1(matrix, i) = f32Rand(1);
         }
     }
 }

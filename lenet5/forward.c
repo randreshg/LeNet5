@@ -55,7 +55,7 @@ void subsampling_forward(Feature **input) {
         for(on = 0; on < outputMatrix->n; on++)
         for(om = 0; om < outputMatrix->m; om++) {
             //Subsampling
-            max = -100.0, aux_n = ln_length*on, aux_m = lm_length*om;
+            max = -1, aux_n = ln_length*on, aux_m = lm_length*om;
             for(ln = 0; ln < ln_length; ln++)
             for(lm = 0; lm < lm_length; lm++) {
                 aux = MATRIX_VALUE(inputMatrix, (aux_n + ln), (aux_m + lm));
