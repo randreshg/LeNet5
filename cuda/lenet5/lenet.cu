@@ -131,22 +131,34 @@ void backwardPropagation(LeNet **lenet, Feature **features, LeNet **lenetGradien
 
 // ----- Others ----- //
 void loadInput(uint8 *input, Feature *features) {
-    //Aux variables
-    Matrix *inputMatrix = FEATURE_GETMATRIX(features, 0);
-    uint in, im;
-    number mean = 0, std = 0, val;
-    //Calculate standar deviation and mean
-    for(in = 0; in < IMG_SIZE; in++){
-        val = input[in];
-        mean += val;
-        std += val*val;
+    uint tn = threadIdx.y, tm = threadIdx.x;
+    uint tid = tn*blockDim.x + tm;
+    //Shared memory
+    __shared__ number s_input[blockDim.x*blockDim.x];
+    __shared__ number s_mean[blockDim.x*blockDim.x];
+    __shared__ number s_std[blockDim.x *blockDim.x];
+    //Load shared mem from global mem
+    s_input[tid] = (number) input[tid];
+    s_mean[tid] = s_input[tid];
+    s_std[tid] = s_input[tid]*s_input[tid];
+    __syncthreads();
+    //do reduction in shared mem
+    for (uint s = blockDim.x / 2; s > 0; s >>= 1) {
+        if (tid < s) {
+            s_mean[tid] += s_mean[tid + s];
+            s_std[tid] += s_std[tid + s];
+        }
+        __syncthreads();
     }
-    mean = mean/IMG_SIZE;
-    std = sqrt(std/IMG_SIZE - mean*mean);
-    //Normalize data and add padding
-    for(in = 0; in < IMG_ROWS; in++)
-    for(im = 0; im < IMG_COLS; im++)
-        MATRIX_VALUE(inputMatrix, (in + 2), (im + 2)) = (input[in*IMG_COLS + im] - mean) / std;
+    //Thread 0 computes mean and std
+    if (tid == 0) {
+        s_mean[0] = s_mean[0]/IMG_SIZE;
+        s_std[0] = sqrt(s_std[0]/IMG_SIZE - s_mean[0]*s_mean[0]);
+    }
+    __syncthreads();
+    //Write result back to global mem
+    Matrix *inputMatrix = FEATURE_GETMATRIX(features, blockIdx.x);
+    MATRIX_VALUE(inputMatrix, (tn + 2), (tm + 2)) = (s_input[tid] - s_mean[0]) / s_std[0];
 }
 
 // ----- Initial values ----- //

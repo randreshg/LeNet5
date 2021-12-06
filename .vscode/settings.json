@@ -8,6 +8,15 @@
         "math.h": "c",
         "lenet.h": "c",
         "mnist.h": "c",
-        "unistd.h": "c"
+        "unistd.h": "c",
+        "cmath": "cpp",
+        "cstdarg": "cpp",
+        "cstdio": "cpp",
+        "cstdlib": "cpp",
+        "type_traits": "cpp",
+        "limits": "cpp",
+        "*.tcc": "cpp",
+        "cstdint": "cpp",
+        "typeinfo": "cpp"
     }
 }

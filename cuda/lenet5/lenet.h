@@ -1,6 +1,7 @@
 #pragma once
 #include "global/global.h"
 #include "mnist/mnist.h"
+#include <cuda_runtime.h>
 /* ----- CONSTANTS ----- */
 #define LEARNING_RATE   0.5
 #define LENGTH_KERNEL   5
