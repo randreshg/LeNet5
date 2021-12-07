@@ -46,7 +46,8 @@ struct matrix
     uint n, m;
     number *p;
 };
-#define MATRIX_VALUE(ma, ni, mi) (*((ma)->p + (ni)*((ma)->m) + (mi)))
+#define MATRIX_POINTER(ma, ni, mi) ((ma)->p + (ni)*((ma)->m) + (mi))
+#define MATRIX_VALUE(ma, ni, mi) (*(MATRIX_POINTER(ma, ni, mi)))
 #define MATRIX_VALUE1(ma, ni) (*((ma)->p + (ni)))
 #define MATRIX_SIZE(ma) (((ma)->n)*((ma)->m))
 extern void MATRIX_FREE(Matrix **a);

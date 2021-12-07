@@ -112,12 +112,12 @@ uint8 getResult(Feature *features) {
 
 // ----- Propagation ----- //
 void forwardPropagation(LeNet **lenet, Feature **features) {
-    convolution_forward(features, *lenet[0]);
-    subsampling_forward(features + 1);
-    convolution_forward(features + 2, *lenet[1]);
-    subsampling_forward(features + 3);
-    convolution_forward(features + 4, *lenet[2]);
-    dotproduct_forward (features + 5, *lenet[3]);
+    convolution_forward<<<dim3(INPUT, LAYER1), dim3(LENGTH_FEATURE0, LENGTH_FEATURE0)>>>(features, *lenet[0]);
+    // subsampling_forward(features + 1);
+    // convolution_forward(features + 2, *lenet[1]);
+    // subsampling_forward(features + 3);
+    // convolution_forward(features + 4, *lenet[2]);
+    // dotproduct_forward (features + 5, *lenet[3]);
 }
 
 void backwardPropagation(LeNet **lenet, Feature **features, LeNet **lenetGradient, Feature **featuresGradient) {
@@ -130,7 +130,7 @@ void backwardPropagation(LeNet **lenet, Feature **features, LeNet **lenetGradien
 }
 
 // ----- Others ----- //
-void loadInput(uint8 *input, Feature *features) {
+__global__ void loadInput(uint8 *input, Feature *features) {
     uint tn = threadIdx.y, tm = threadIdx.x;
     uint tid = tn*blockDim.x + tm;
     //Shared memory

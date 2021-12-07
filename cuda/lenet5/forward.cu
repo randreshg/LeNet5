@@ -12,31 +12,63 @@ void activation_forward(Feature *output, Array *bias, number (*action)(number)) 
     }
 }
 
-void convolute_forward(Matrix *input, Matrix *weight, Matrix *output) {
-    //Aux variables
-    uint on, om, wn, wm;
-    //Output loop
-    for(on = 0; on < output->n; on++)
-    for(om = 0; om < output->m; om++) {
+__global__ void convolute_forward(Matrix *input, Matrix *weight, Matrix *output) {
+    uint tn = threadIdx.y, tm = threadIdx.x;
+    uint tid = tn*blockDim.x + tm;
+    //Shared memory
+    __shared__ number s_input[blockDim.y][blockDim.x];
+    __shared__ number s_weight[weight->n][weight->m];
+    //Load shared mem from global mem
+    s_input[tn][tm] = MATRIX_VALUE(input, tn, tm);
+    if(tid < (weight->n*weight->m))
+        s_weight[tn][tm] = MATRIX_VALUE(weight, tn, tm);
+    __syncthreads();
+    //Thread id inside output matrix
+    if(tid < (output->n*output->m)) {
+        //Aux variables
+        uint wn, wm;
+        number result = 0;
         //Weight matrix loop - KERNEL
         for(wn = 0; wn < weight->n; wn++)
         for(wm = 0; wm < weight->m; wm++)
-            //Cross-Correlation
-            MATRIX_VALUE(output, on, om) += MATRIX_VALUE(input, (on + wn), (om + wm)) * MATRIX_VALUE(weight, wn, wm);
+            result += s_input[(tn + wn), (tm + wm)]) * s_weight[wn, wm];
+        //Write back result
+        atomicAdd(MATRIX_POINTER(output, tn, tm), result);
     }
 }
 
-void convolution_forward(Feature **input, LeNet lenet) {
-    Feature *output = *(input + 1);
+__global__ void convolution_forward(Feature **input, LeNet lenet) {
+    uint bn = blockIdx.y,  bm = blockIdx.x;
+    uint tn = threadIdx.y, tm = threadIdx.x;
+    uint tid = tn*blockDim.x + tm;
     //Aux variables
-    uint wn, wm;
-    //Convolution
-    for(wn = 0; wn < lenet.weight->n; wn++)
-    for(wm = 0; wm < lenet.weight->m; wm++)
-        convolute_forward(FEATURE_GETMATRIX(*input, wn), WEIGHT_GETMATRIX(lenet.weight, wn, wm), 
-                          FEATURE_GETMATRIX(output, wm));
+    Matrix *input  = FEATURE_GETMATRIX(*input, bn),
+           *output = FEATURE_GETMATRIX(*(input + 1), bm),
+           *weight = WEIGHT_GETMATRIX(lenet.weight, bn, bm);
+    // ---- Convolution ---- //
+    //Shared memory
+    __shared__ number s_input[blockDim.y][blockDim.x];
+    __shared__ number s_weight[weight->n][weight->m];
+    //Load shared mem from global mem
+    s_input[tn][tm] = MATRIX_VALUE(input, tn, tm);
+    if(tid < (weight->n*weight->m))
+        s_weight[tn][tm] = MATRIX_VALUE(weight, tn, tm);
+    __syncthreads();
+    //Thread id inside output matrix
+    if(tid < (output->n*output->m)) {
+        //Aux variables
+        uint wn, wm;
+        number result = 0;
+        //Weight matrix loop - KERNEL
+        for(wn = 0; wn < weight->n; wn++)
+        for(wm = 0; wm < weight->m; wm++)
+            result += s_input[(tn + wn), (tm + wm)]) * s_weight[wn, wm];
+        //Write back result
+        atomicAdd(MATRIX_POINTER(output, tn, tm), result);
+    }
+
     //Activation function
-    activation_forward(output, lenet.bias, ReLU);
+    //activation_forward(output, lenet.bias, ReLU);
 }
 
 void subsampling_forward(Feature **input) {
