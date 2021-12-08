@@ -18,8 +18,7 @@ typedef struct array Array;
 #include <time.h>
 
 /* ----- ARRAY ----- */
-struct array
-{
+struct array {
     uint n;
     number *p;
 };
@@ -28,8 +27,7 @@ extern void ARRAY_FREE(Array **ar);
 extern Array *ARRAY(uint n);
 
 /* ----- FEATURE ----- */
-struct feature
-{
+struct feature {
     uint n;
     Matrix **matrix;
 };
@@ -41,8 +39,7 @@ extern Feature *FEATURE(uint n, uint fm_n, uint fm_m);
 
 
 /* ----- MATRIX ----- */
-struct matrix
-{
+struct matrix {
     uint n, m;
     number *p;
 };
@@ -53,8 +50,7 @@ extern void MATRIX_FREE(Matrix **a);
 extern Matrix *MATRIX(number n, number m);
 
 /* ----- WEIGHT ----- */
-struct weight
-{
+struct weight {
     uint n, m;
     Matrix **matrix;
 };

@@ -4,11 +4,10 @@
 uint testing(LeNet **lenet, uint8 testImage[][IMG_SIZE], uint8 *testLabel, uint total_size) {
     printf("--------\n");
     printf("TESTING\n");
-    uint rightPredictions=0, percent=0, i;
+    uint rightPredictions = 0, percent = 0, i;
     uint8 prediction;
-    for (i=0; i<total_size; i++){
+    for (i = 0; i < total_size; i++) {
         prediction = predict(lenet, testImage[i]);
-        //printf("TARGET:%u - PREDICTION:%u\n", testLabel[i], prediction);
         rightPredictions += (testLabel[i] == prediction);
         if (i * 100 / total_size > percent)
             printf("test:%2d%%\n", percent = i*100/total_size);
@@ -41,8 +40,6 @@ int main() {
     static uint8 testImage[NUM_TEST][IMG_SIZE]; 
     static uint8 testLabel[NUM_TEST];
     load_testData(testImage, testLabel);
-    
-  
     //Process starts
     clock_t start = clock();
     if(train)
