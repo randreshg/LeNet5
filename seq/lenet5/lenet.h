@@ -74,6 +74,6 @@ extern void softMax(Feature *input, uint8 target, Feature *featureGradient);
 extern number costFunction(Feature *input, uint8 target);
 extern number ReLU(number x);
 extern number ReLU_GRAD(number x);
-#define f32Rand(a) (((double)rand()/(double)(RAND_MAX))*(2*a) - a);
+#define f32Rand(a) (((float)rand()/(float)(RAND_MAX))*(2*a) - a);
 
 
