@@ -4,7 +4,7 @@
 typedef enum { false, true } bool;
 typedef unsigned char uint8;
 typedef unsigned int uint;
-typedef double number;
+typedef float number;
 
 typedef struct feature Feature;
 typedef struct matrix Matrix;
