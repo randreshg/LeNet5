@@ -92,12 +92,12 @@ void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, L
            *weightGradientMatrix = WEIGHT_GETMATRIX1(lenetGradient->weight, 0),
            *inputGradientMatrix = FEATURE_GETMATRIX(*inputGradient, 0);
     //Constants
-    const uint wn1_length = outputGradient->n, wn2_length = (weightMatrix->n)/wn1_length;
+    const uint wn1Length = outputGradient->n, wn2Length = (weightMatrix->n)/wn1Length;
     //Dot product + activation function
-    for(wn1 = 0; wn1 < wn1_length; wn1++) {
+    for(wn1 = 0; wn1 < wn1Length; wn1++) {
         auxMatrix = FEATURE_GETMATRIX(outputGradient, wn1);
-        wn1_aux = wn1*wn2_length;
-        for(wn2 = 0; wn2 < wn2_length; wn2++) {
+        wn1_aux = wn1*wn2Length;
+        for(wn2 = 0; wn2 < wn2Length; wn2++) {
             //Dot product
             for(wm = 0; wm < weightMatrix->m; wm++)
                 MATRIX_VALUE1(auxMatrix, wn2) += MATRIX_VALUE1(inputGradientMatrix, wm) * MATRIX_VALUE(weightMatrix, (wn1_aux + wn2), wm);
@@ -110,9 +110,9 @@ void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, L
         ARRAY_VALUE(lenetGradient->bias, wm) += MATRIX_VALUE1(inputGradientMatrix, wm);
     //Update weights
     auxMatrix = FEATURE_GETMATRIX(input, 0);
-    for(wn1 = 0; wn1 < wn1_length; wn1++) {
-        wn1_aux = wn1*wn2_length;
-        for(wn2 = 0; wn2 < wn2_length; wn2++) {
+    for(wn1 = 0; wn1 < wn1Length; wn1++) {
+        wn1_aux = wn1*wn2Length;
+        for(wn2 = 0; wn2 < wn2Length; wn2++) {
             //Dot product
             for(wm = 0; wm < weightMatrix->m; wm++)
                 MATRIX_VALUE(weightGradientMatrix, (wn1_aux + wn2), wm) += MATRIX_VALUE1(auxMatrix, wn2) * MATRIX_VALUE1(inputGradientMatrix, wm);

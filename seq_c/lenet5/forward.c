@@ -73,12 +73,12 @@ void dotproduct_forward(Feature **input, LeNet lenet) {
     Matrix *inputMatrix, 
            *weightMatrix = WEIGHT_GETMATRIX1(lenet.weight, 0),
            *outputMatrix = FEATURE_GETMATRIX(output, 0);
-    const uint wn1_length = (*input)->n, wn2_length = (weightMatrix->n)/wn1_length;
+    const uint wn1Length = (*input)->n, wn2Length = (weightMatrix->n)/wn1Length;
     //Dot product
-    for(wn1 = 0; wn1 < wn1_length; wn1++) {
+    for(wn1 = 0; wn1 < wn1Length; wn1++) {
         inputMatrix = FEATURE_GETMATRIX(*input, wn1);
-        wn1_aux = wn1*wn2_length;
-        for(wn2 = 0; wn2 < wn2_length; wn2++)
+        wn1_aux = wn1*wn2Length;
+        for(wn2 = 0; wn2 < wn2Length; wn2++)
         for(wm = 0; wm < weightMatrix->m; wm++)
             MATRIX_VALUE1(outputMatrix, wm) += MATRIX_VALUE1(inputMatrix, wn2) * MATRIX_VALUE(weightMatrix, (wn1_aux + wn2), wm);
     }
