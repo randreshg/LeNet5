@@ -1,5 +1,4 @@
 #pragma once
-#include "global/global.h"
 #include "mnist/mnist.h"
 /* ----- CONSTANTS ----- */
 #define LEARNING_RATE   0.5
@@ -21,12 +20,11 @@
 #define LAYER5          120
 #define OUTPUT          10
 
-/* ----- DATA STRUCTURES ----- */
-typedef struct {
-    Weight *weight;
-    Array *bias;
-} LeNet;
+typedef unsigned char uint8;
+typedef unsigned int uint;
+typedef float number;
 
+/* ----- DATA STRUCTURES ----- */
 typedef struct {
     //Weight matrix
     number weight0_1[INPUT] [LAYER1][LENGTH_KERNEL][LENGTH_KERNEL];
@@ -50,50 +48,59 @@ typedef struct {
     number output[OUTPUT];
 }Features;
 
-/* ----- CONSTRUCTOR ----- */
-extern LeNet *LENET(const uint n, const uint m, const uint wm_n, const uint wm_m, const uint bi_n);
-extern void LENET_FREE(LeNet **lenet);
-
-extern void freeLenet(LeNet ***lenet);
-extern void freeFeatures(Feature ***features);
 /* ----- FUNCTIONS ----- */
 //Training
 extern void updateWeight(const number factor, Weight *weightGradient, Weight *weight);
 extern void updateBias(const number factor, Array *biasGradient, Array *bias);
-extern void updateParameters(const number factor, LeNet **lenetGradient, LeNet **lenet);
-extern void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uint batchSize);
+extern void updateParameters(const number factor, LeNet5 **lenetGradient, LeNet5 **lenet);
+extern void trainBatch(LeNet5 **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uint batchSize);
 //Prediction
-extern uint8 predict(LeNet **lenet, uint8 *input);
+extern uint8 predict(LeNet5 **lenet, uint8 *input);
 extern uint8 getResult(Feature *features);
 //Propagation
-extern void forwardPropagation(LeNet **lenet, Feature **features);
-extern void backwardPropagation(LeNet **lenet, Feature **features, LeNet **lenetGradient, Feature **featuresGradient);
+extern void forwardPropagation(LeNet5 **lenet, Feature **features);
+extern void backwardPropagation(LeNet5 **lenet, Feature **features, LeNet5 **lenetGradient, Feature **featuresGradient);
 //Others
 extern void loadInput(uint8 *input, Feature *features);
 //Initial values
-extern LeNet **LENET_INITIAL();
-extern Feature **FEATURES_INITIAL();
-extern void setInitialValues(LeNet **lenet);
-extern void initialValues(LeNet *lenet, const number value);
-extern void randInitialValues(LeNet *lenet);
+extern void setInitialValues(LeNet5 **lenet);
+extern void initialValues(LeNet5 *lenet, const number value);
+extern void randInitialValues(LeNet5 *lenet);
 
 /* ----- FORWARD ----- */
-extern void activation_forward(Feature *output, Array *bias, number (*action)(number));
-extern void convolute_forward(Matrix *input, Matrix *weight, Matrix *output );
-extern void convolution_forward(Feature **input, LeNet lenet);
-extern void subsampling_forward(Feature **input);
-extern void dotproduct_forward(Feature **input, LeNet lenet);
+template<size_t ON, size_t ON1, size_t OM1, size_t BN>
+extern void activation_forward(number (&output)[ON][ON1][OM1], number (&bias)[BN]);
+template<size_t IN, size_t IM, size_t WN, size_t WM, size_t ON, size_t OM>
+extern void convolute_forward(number (&input)[IN][IM], number (&weight)[WN][WM], number (&output)[ON][OM]);
+template<size_t IN, size_t IN1, size_t IM1, size_t WN, size_t WM, size_t WN1, size_t WM1, size_t BN, size_t ON, size_t ON1, size_t OM1>
+extern void convolution_forward(number (&input)[IN][IN1][IM1], number (&weight)[WN][WM][WN1][WM1], number (&bias)[BN], number (&output)[ON][ON1][OM1]);
+template<size_t IN, size_t IN1, size_t IM1, size_t ON, size_t ON1, size_t OM1>
+extern void subsampling_forward(number (&input)[IN][IN1][IM1], number (&output)[ON][ON1][OM1]);
+template<size_t IN, size_t IN1, size_t IM1, size_t WN, size_t WM, size_t BN, size_t ON>
+extern void dotproduct_forward(number (&input)[IN][IN1][IM1], number (&weight)[WN][WM], number (&bias)[BN], number (&output)[ON]);
 
 /* ----- BACKWARD ----- */
-extern void activation_backward(Feature *input, Feature *output, number (*action)(number));
-extern void convolute_backward(Matrix *input, Matrix *weight, Matrix *output);
-extern void convolution_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *lenetGradient);
-extern void subsampling_backward(Feature *input, Feature **inputGradient);
-extern void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *lenetGradient);
+template<size_t IN, size_t IN1, size_t IM1, size_t ON, size_t ON1, size_t OM1>
+extern void activation_backward(number (&input)[IN][IN1][IM1], number (&output)[ON][ON1][OM1]);
+template<size_t IN, size_t IM, size_t WN, size_t WM, size_t ON, size_t OM>
+extern void convolute_backward(number (&input)[IN][IM], number (&weight)[WN][WM], number (&output)[ON][OM]);
+template<size_t IN, size_t IN1, size_t IM1, size_t IGN, size_t IGN1, size_t IGM1,
+         size_t WN, size_t WM,  size_t WN1, size_t WM1, size_t WGN, size_t WGM, size_t WGN1, size_t WGM1, size_t BG1,
+         size_t OGN, size_t OGN1, size_t OGM1>
+extern void convolution_backward(number (&input)[IN][IN1][IM1], number (&inputGradient)[IGN][IGN1][IGM1],
+                                 number (&weight)[WN][WM][WN1][WM1], number (&weightGradient)[WGN][WGM][WGN1][WGM1], number (&biasGradient)[BG1],
+                                 number (&outputGradient)[OGN][OGN1][OGM1]);
+template<size_t IN, size_t IN1, size_t IM1, size_t IGN, size_t IGN1, size_t IGM1, size_t OGN, size_t OGN1, size_t OGM1>
+extern void subsampling_backward(number (&input)[IN][IN1][IM1], number (&inputGradient)[IGN][IGN1][IGM1], number (&outputGradient)[OGN][OGN1][OGM1]);
+template<size_t IN, size_t IN1, size_t IM1, size_t IGN,
+         size_t WN, size_t WM,  size_t WN1, size_t WM1, size_t WGN, size_t WGM, size_t BG1,
+         size_t OGN, size_t OGN1, size_t OGM1>
+extern void dotproduct_backward(number (&input)[IN][IN1][IM1], number (&inputGradient)[IGN],
+                                number (&weight)[WN][WM][WN1][WM1], number (&weightGradient)[WGN][WGM], number (&biasGradient)[BG1],
+                                number (&outputGradient)[OGN][OGN1][OGM1]);
 
 /* ----- OTHERS ----- */
 extern void softMax(Feature *input, uint8 target, Feature *featureGradient);
-extern number costFunction(Feature *input, uint8 target);
 extern number ReLU(number x);
 extern number ReLU_GRAD(number x);
 #define f32Rand(a) (((float)rand()/(float)(RAND_MAX))*(2*a) - a);
