@@ -45,8 +45,8 @@ void subsampling_forward(Feature **input) {
     Matrix *inputMatrix, *outputMatrix;
     uint o, on, om, ln, lm, aux_n, aux_m;
     number max, aux;
-    const uint ln_length = FEATURE_GETMATRIX(*input, 0)->n / FEATURE_GETMATRIX(output, 0)->n,
-               lm_length = FEATURE_GETMATRIX(*input, 0)->m / FEATURE_GETMATRIX(output, 0)->m;
+    const uint lnLength = FEATURE_GETMATRIX(*input, 0)->n / FEATURE_GETMATRIX(output, 0)->n,
+               lmLength = FEATURE_GETMATRIX(*input, 0)->m / FEATURE_GETMATRIX(output, 0)->m;
     //Ouput array loop
     for(o = 0; o < output->n; o++) {
         inputMatrix = FEATURE_GETMATRIX(*input, o);
@@ -55,9 +55,9 @@ void subsampling_forward(Feature **input) {
         for(on = 0; on < outputMatrix->n; on++)
         for(om = 0; om < outputMatrix->m; om++) {
             //Subsampling
-            max = -1, aux_n = ln_length*on, aux_m = lm_length*om;
-            for(ln = 0; ln < ln_length; ln++)
-            for(lm = 0; lm < lm_length; lm++) {
+            max = -1, aux_n = lnLength*on, aux_m = lmLength*om;
+            for(ln = 0; ln < lnLength; ln++)
+            for(lm = 0; lm < lmLength; lm++) {
                 aux = MATRIX_VALUE(inputMatrix, (aux_n + ln), (aux_m + lm));
                 max = (aux > max) ? aux:max;
             }
