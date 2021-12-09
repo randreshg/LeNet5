@@ -22,11 +22,33 @@
 #define OUTPUT          10
 
 /* ----- DATA STRUCTURES ----- */
-typedef struct
-{
+typedef struct {
     Weight *weight;
     Array *bias;
 } LeNet;
+
+typedef struct {
+    //Weight matrix
+    number weight0_1[INPUT] [LAYER1][LENGTH_KERNEL][LENGTH_KERNEL];
+    number weight2_3[LAYER2][LAYER3][LENGTH_KERNEL][LENGTH_KERNEL];
+    number weight4_5[LAYER4][LAYER5][LENGTH_KERNEL][LENGTH_KERNEL];
+    number weight5_6[LAYER5 * LENGTH_FEATURE5 * LENGTH_FEATURE5][OUTPUT];
+    //Bias
+    number bias0_1[LAYER1];
+    number bias2_3[LAYER3];
+    number bias4_5[LAYER5];
+    number bias5_6[OUTPUT];
+}LeNet5;
+
+typedef struct {
+    number input [INPUT] [LENGTH_FEATURE0][LENGTH_FEATURE0];
+    number layer1[LAYER1][LENGTH_FEATURE1][LENGTH_FEATURE1];
+    number layer2[LAYER2][LENGTH_FEATURE2][LENGTH_FEATURE2];
+    number layer3[LAYER3][LENGTH_FEATURE3][LENGTH_FEATURE3];
+    number layer4[LAYER4][LENGTH_FEATURE4][LENGTH_FEATURE4];
+    number layer5[LAYER5][LENGTH_FEATURE5][LENGTH_FEATURE5];
+    number output[OUTPUT];
+}Features;
 
 /* ----- CONSTRUCTOR ----- */
 extern LeNet *LENET(const uint n, const uint m, const uint wm_n, const uint wm_m, const uint bi_n);
