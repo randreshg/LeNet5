@@ -23,7 +23,7 @@ void convolute_backward(Matrix *input, Matrix *weight, Matrix *output ) {
         for(wn = 0; wn < weight->n; wn++)
         for(wm = 0; wm < weight->m; wm++)
             //Cross-Correlation
-            MATRIX_VALUE(output, (in+wn), (im+wm)) += MATRIX_VALUE(input, in, im) * MATRIX_VALUE(weight, wn, wm);
+            MATRIX_VALUE(output, (in + wn), (im + wm)) += MATRIX_VALUE(input, in, im) * MATRIX_VALUE(weight, wn, wm);
     }
 }
 

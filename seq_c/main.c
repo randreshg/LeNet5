@@ -1,16 +1,16 @@
 //gcc -o main main.c lenet5/lenet.c lenet5/backward.c lenet5/forward.c lenet5/others.c
 #include "lenet5/lenet.h"
 
-uint testing(LeNet **lenet, uint8 testImage[][IMG_SIZE], uint8 *testLabel, uint total_size) {
+uint testing(LeNet **lenet, uint8 testImage[][IMG_SIZE], uint8 *testLabel, uint totalSize) {
     printf("--------\n");
     printf("TESTING\n");
     uint rightPredictions = 0, percent = 0, i;
     uint8 prediction;
-    for (i = 0; i < total_size; i++) {
+    for (i = 0; i < totalSize; i++) {
         prediction = predict(lenet, testImage[i]);
         rightPredictions += (testLabel[i] == prediction);
-        if (i * 100 / total_size > percent)
-            printf("test:%2d%%\n", percent = i*100/total_size);
+        if (i * 100 / totalSize > percent)
+            printf("test:%2d%%\n", percent = i*100/totalSize);
     }
     return rightPredictions;
 }
