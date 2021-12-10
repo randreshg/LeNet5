@@ -20,11 +20,11 @@ void convolute_forward(number (&input)[IN][IM], number (&weight)[WN][WM], number
         for(wn = 0; wn < WN; wn++)
         for(wm = 0; wm < WM; wm++)
             //Cross-Correlation
-            output[wn][wm] += output[on + wn][om + wm] * weight[wn][wm];
+            output[wn][wm] += input[on + wn][om + wm] * weight[wn][wm];
 }
 
 template<size_t IN, size_t IN1, size_t IM1, size_t WN, size_t WM, size_t WN1, size_t WM1, size_t BN, size_t ON, size_t ON1, size_t OM1>
-void convolution_forward(number (&input)[IN][IN1][IM1], number (&weight)[WN][WM][WN1][WM1],number (&bias)[BN], number (&output)[ON][ON1][OM1]) {
+void convolution_forward(number (&input)[IN][IN1][IM1], number (&weight)[WN][WM][WN1][WM1], number (&bias)[BN], number (&output)[ON][ON1][OM1]) {
     //Aux variables
     uint wn, wm;
     //Convolution
@@ -66,6 +66,9 @@ void dotproduct_forward(number (&input)[IN][IN1][IM1], number (&weight)[WN][WM],
     for(wm = 0; wm < WM; wm++)
         output[wm] += ((number *)input)[wn] * weight[wn][wm];
     //Activation function
-    for(wn = 0; wn < BN; wn++)
-        output[wn] = ReLU(output[wn] + bias[wn]);
+    for(wn = 0; wn < BN; wn++){
+        printf("%1.1f ", output[wn]);
+        output[wn] = ReLU(output[wn] + bias[wn]); 
+    }
+    printf("\n");
 }

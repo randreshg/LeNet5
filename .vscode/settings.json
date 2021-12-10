@@ -17,6 +17,7 @@
         "limits": "cpp",
         "*.tcc": "cpp",
         "cstdint": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "*.tpp": "cpp"
     }
 }

@@ -1,4 +1,5 @@
 #include "lenet5/lenet.h"
+#define LENET_FILE 		"model.dat"
 
 uint testing(LeNet *lenet, uint8 testImage[][IMG_SIZE], uint8 *testLabel, uint totalSize) {
     printf("--------\n");
@@ -28,13 +29,23 @@ void training(LeNet *lenet, const uint batchSize, const uint totalSize) {
     }
 }
 
+int load(LeNet *lenet, char filename[])
+{
+	FILE *fp = fopen(filename, "rb");
+	if (!fp) return 1;
+	fread(lenet, sizeof(LeNet), 1, fp);
+	fclose(fp);
+    printf("OK \n");
+	return 0;
+}
+
 int main() {
     //Malloc 
     LeNet lenet;
     printf("-------------------\n");
     printf("PROCESS STARTED\n ");
     //Training
-    bool train = true;
+    bool train = false;
     //Testing
     static uint8 testImage[NUM_TEST][IMG_SIZE]; 
     static uint8 testLabel[NUM_TEST];
@@ -44,7 +55,8 @@ int main() {
     if(train)
         training(&lenet, 300, NUM_TRAIN);
     else
-        setInitialValues(&lenet);
+        load(&lenet, LENET_FILE);
+        //setInitialValues(&lenet);
     uint rightPredictions = testing(&lenet, testImage, testLabel, NUM_TEST);
     //Process ends
     printf("Results: %d/%d\n", rightPredictions, NUM_TEST);

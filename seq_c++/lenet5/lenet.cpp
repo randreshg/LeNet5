@@ -2,7 +2,8 @@
 
 // ----- Training ----- //
 void updateLenet(const number factor, LeNet *inputLenet, LeNet *outputLenet) {
-    for(uint n = 0; n < GETCOUNT(LeNet); n++)
+    const uint lenetSize = GETCOUNT(LeNet);
+    for(uint n = 0; n < lenetSize; n++)
         ((number *)(outputLenet))[n] += factor * ((number *)(inputLenet))[n];
 }
 
@@ -74,5 +75,5 @@ void setInitialValues(LeNet *lenet) {
     for (pos = (number *)lenet->weight4_5; pos < (number *)lenet->weight5_6; *pos++ *= sqrt(6.0 / (LENGTH_KERNEL * LENGTH_KERNEL * (LAYER4 + LAYER5))));
     for (pos = (number *)lenet->weight5_6; pos < (number *)lenet->bias0_1;   *pos++ *= sqrt(6.0 / (LAYER5 + OUTPUT)));
     //Set biases values to 0
-    for (int *p = (int *)lenet->bias0_1; p < (int *)(lenet + 1); *p++ = 0);
+    for (pos = (number *)lenet->bias0_1;  pos < (number *)(lenet + 1); *pos++ = 0);
 }
