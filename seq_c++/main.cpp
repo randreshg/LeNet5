@@ -30,7 +30,7 @@ void training(LeNet *lenet, const uint batchSize, const uint totalSize) {
 
 int main() {
     //Malloc 
-    LeNet *lenet;
+    LeNet lenet;
     printf("-------------------\n");
     printf("PROCESS STARTED\n ");
     //Training
@@ -42,17 +42,13 @@ int main() {
     //Process starts
     clock_t start = clock();
     if(train)
-        training(lenet, 300, NUM_TRAIN);
+        training(&lenet, 300, NUM_TRAIN);
     else
-        setInitialValues(lenet);
-    uint rightPredictions = testing(lenet, testImage, testLabel, NUM_TEST);
+        setInitialValues(&lenet);
+    uint rightPredictions = testing(&lenet, testImage, testLabel, NUM_TEST);
     //Process ends
     printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
     printf("Time: %u\n", (unsigned)(clock() - start));
-    //Free
-    printf("-------------------\n");
-    printf("FREE LENET MEMORY\n");
-    free(lenet);
     return 0;
 }
 

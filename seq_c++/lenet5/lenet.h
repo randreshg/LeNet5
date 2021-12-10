@@ -109,4 +109,6 @@ extern number ReLU_GRAD(number x);
 extern void loadInput(uint8 *input, number output[INPUT][LENGTH_FEATURE0][LENGTH_FEATURE0]);
 extern void softMax(number input[OUTPUT], uint8 target, number outputGradient[OUTPUT]);
 
-
+/* ----- TEMPLATE ----- */
+#include "backward.tpp"
+#include "forward.tpp"
