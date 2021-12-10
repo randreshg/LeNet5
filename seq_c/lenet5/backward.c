@@ -109,8 +109,8 @@ void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, L
     for(wm = 0; wm < (lenetGradient->bias)->n; wm++)
         ARRAY_VALUE(lenetGradient->bias, wm) += MATRIX_VALUE1(inputGradientMatrix, wm);
     //Update weights
-    auxMatrix = FEATURE_GETMATRIX(input, 0);
     for(wn1 = 0; wn1 < wn1Length; wn1++) {
+        auxMatrix = FEATURE_GETMATRIX(input, wn1);
         wn1_aux = wn1*wn2Length;
         for(wn2 = 0; wn2 < wn2Length; wn2++) {
             //Dot product
