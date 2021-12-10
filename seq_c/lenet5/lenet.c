@@ -125,26 +125,6 @@ void backwardPropagation(LeNet **lenet, Feature **features, LeNet **lenetGradien
     convolution_backward(features[0], *lenet[0], featuresGradient + 1, lenetGradient[0]);
 }
 
-// ----- Others ----- //
-void loadInput(uint8 *input, Feature *features) {
-    //Aux variables
-    Matrix *inputMatrix = FEATURE_GETMATRIX(features, 0);
-    uint in, im;
-    number mean = 0, std = 0, val;
-    //Calculate standard deviation and mean
-    for(in = 0; in < IMG_SIZE; in++){
-        val = input[in];
-        mean += val;
-        std += val*val;
-    }
-    mean = mean/IMG_SIZE;
-    std = sqrt(std/IMG_SIZE - mean*mean);
-    //Normalize data and add padding
-    for(in = 0; in < IMG_ROWS; in++)
-    for(im = 0; im < IMG_COLS; im++)
-        MATRIX_VALUE(inputMatrix, (in + 2), (im + 2)) = (input[in*IMG_COLS + im] - mean) / std;
-}
-
 // ----- Initial values ----- //
 LeNet **LENET_INITIAL() {
     LeNet **lenet = (LeNet **) malloc(4 * sizeof(LeNet *));

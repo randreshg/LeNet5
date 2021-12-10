@@ -45,8 +45,6 @@ extern uint8 getResult(Feature *features);
 //Propagation
 extern void forwardPropagation(LeNet **lenet, Feature **features);
 extern void backwardPropagation(LeNet **lenet, Feature **features, LeNet **lenetGradient, Feature **featuresGradient);
-//Others
-extern void loadInput(uint8 *input, Feature *features);
 //Initial values
 extern LeNet **LENET_INITIAL();
 extern Feature **FEATURES_INITIAL();
@@ -69,10 +67,11 @@ extern void subsampling_backward(Feature *input, Feature **inputGradient);
 extern void dotproduct_backward(Feature *input, LeNet lenet, Feature **inputGradient, LeNet *lenetGradient);
 
 /* ----- OTHERS ----- */
-extern void softMax(Feature *input, uint8 target, Feature *featureGradient);
-extern number costFunction(Feature *input, uint8 target);
+#define f32Rand(a) (((float)rand()/(float)(RAND_MAX))*(2*a) - a);
 extern number ReLU(number x);
 extern number ReLU_GRAD(number x);
-#define f32Rand(a) (((float)rand()/(float)(RAND_MAX))*(2*a) - a);
+extern void loadInput(uint8 *input, Feature *features);
+extern void softMax(Feature *input, uint8 target, Feature *featureGradient);
+extern number costFunction(Feature *input, uint8 target);
 
 
