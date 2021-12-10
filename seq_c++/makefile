@@ -1,31 +1,28 @@
 MKDIR_P := mkdir -p
 OUT_DIR := build
 OBJDIR    =   objdir
-OBJ = $(addprefix $(OBJDIR)/, $(patsubst %.c, %.o, $(wildcard *.c)))
+OBJ = $(addprefix $(OBJDIR)/, $(patsubst %.cpp, %.o, $(wildcard *.cpp)))
 
-lenet: main.o lenet.o backward.o forward.o others.o global.o mnist.o
-	gcc -o lenet $(OUT_DIR)/main.o $(OUT_DIR)/lenet.o $(OUT_DIR)/backward.o $(OUT_DIR)/forward.o $(OUT_DIR)/others.o $(OUT_DIR)/global.o $(OUT_DIR)/mnist.o -lm
+lenet: main.o lenet.o backward.o forward.o others.o mnist.o
+	g++ -o lenet $(OUT_DIR)/main.o $(OUT_DIR)/lenet.o $(OUT_DIR)/backward.o $(OUT_DIR)/forward.o $(OUT_DIR)/others.o $(OUT_DIR)/mnist.o -lm
 
-main.o: main.c
-	gcc -c main.c -o $(OUT_DIR)/$@
+main.o: main.cpp
+	g++ -c main.cpp -o $(OUT_DIR)/$@
 
-lenet.o: lenet5/lenet.c
-	gcc -c lenet5/lenet.c -o $(OUT_DIR)/$@
+lenet.o: lenet5/lenet.cpp
+	g++ -c lenet5/lenet.cpp -o $(OUT_DIR)/$@
 
-backward.o: lenet5/backward.c
-	gcc -c lenet5/backward.c -o $(OUT_DIR)/$@
+backward.o: lenet5/backward.cpp
+	g++ -c lenet5/backward.cpp -o $(OUT_DIR)/$@
 
-forward.o: lenet5/forward.c
-	gcc -c lenet5/forward.c -o $(OUT_DIR)/$@
+forward.o: lenet5/forward.cpp
+	g++ -c lenet5/forward.cpp -o $(OUT_DIR)/$@
 
-others.o: lenet5/others.c
-	gcc -c lenet5/others.c -o $(OUT_DIR)/$@
+others.o: lenet5/others.cpp
+	g++ -c lenet5/others.cpp -o $(OUT_DIR)/$@
 
-global.o: lenet5/global/global.c
-	gcc -c lenet5/global/global.c -o $(OUT_DIR)/$@
-
-mnist.o: lenet5/mnist/mnist.c
-	gcc -c lenet5/mnist/mnist.c -o $(OUT_DIR)/$@
+mnist.o: lenet5/mnist/mnist.cpp
+	g++ -c lenet5/mnist/mnist.cpp -o $(OUT_DIR)/$@
 
 # Aux
 .PHONY: directories all clean

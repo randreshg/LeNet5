@@ -66,7 +66,7 @@ void subsampling_backward(number (&input)[IN][IN1][IM1], number (&inputGradient)
                 if(aux > max)
                     max = aux, maxLn = (aux_n + ln), maxLm = (aux_m + lm);
             }
-            outputGradientMatrix[i][maxLn][maxLm] = inputGradientMatrix[i][in][im];
+            outputGradient[i][maxLn][maxLm] = inputGradient[i][in][im];
         }
     }
 }
@@ -82,21 +82,14 @@ void dotproduct_backward(number (&input)[IN][IN1][IM1], number (&inputGradient)[
     //Dot product
     for(wn = 0; wn < WN; wn++) 
     for(wm = 0; wm < WM; wm++)
-        ((number *)outputGradient)[wn] += inputGradient[wm] * weightMatrix[wn][wm];
+        ((number *)outputGradient)[wn] += inputGradient[wm] * weight[wn][wm];
     //Activation function
     activation_backward(input, outputGradient);
     //Update bias
     for(wn = 0; wn < IGN; wn++)
         biasGradient[wn] += inputGradient[wn];
-
     //Update weights
-    auxMatrix = FEATURE_GETMATRIX(input, 0);
-    for(wn1 = 0; wn1 < wn1Length; wn1++) {
-        wn1_aux = wn1*wn2Length;
-        for(wn2 = 0; wn2 < wn2Length; wn2++) {
-            //Dot product
-            for(wm = 0; wm < weightMatrix->m; wm++)
-                MATRIX_VALUE(weightGradientMatrix, (wn1_aux + wn2), wm) += MATRIX_VALUE1(auxMatrix, wn2) * MATRIX_VALUE1(inputGradientMatrix, wm);
-        }
-    }
+    for(wn = 0; wn < WN; wn++) 
+    for(wm = 0; wm < WM; wm++)
+        weightGradient[wn][wm] += ((number *)input)[wn] * inputGradient[wm];
 }

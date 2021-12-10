@@ -64,8 +64,8 @@ void dotproduct_forward(number (&input)[IN][IN1][IM1], number (&weight)[WN][WM],
     //Dot product
     for(wn = 0; wn < WN; wn++) 
     for(wm = 0; wm < WM; wm++)
-        output[wm] += ((number *)input)[wn] * weight[wn][wm]
+        output[wm] += ((number *)input)[wn] * weight[wn][wm];
     //Activation function
-    for(wm = 0; wm < lenet.bias->n; wm++)
-        MATRIX_VALUE1(outputMatrix, wm) = ReLU(MATRIX_VALUE1(outputMatrix, wm) + ARRAY_VALUE(lenet.bias, wm));
+    for(wn = 0; wn < BN; wn++)
+        output[wn] = ReLU(output[wn] + bias[wn]);
 }
