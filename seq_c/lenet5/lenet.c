@@ -61,7 +61,7 @@ void updateParameters(const number factor, LeNet **lenetGradient, LeNet **lenet)
 void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uint batchSize) {
     //Aux variables
     const number alpha = LEARNING_RATE / batchSize;
-    LeNet **lenetGradient, **buffer = LENET_INITIAL();
+    LeNet **lenetGradient, **batchBuffer = LENET_INITIAL();
     Feature **features, **featuresGradient;
     for (uint i = 0; i < batchSize; i++) {
         //Malloc memory
@@ -73,14 +73,14 @@ void trainBatch(LeNet **lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uin
         forwardPropagation(lenet, features);
         softMax(features[6], labels[i], featuresGradient[6]);
         backwardPropagation(lenet, features, lenetGradient, featuresGradient);
-        updateParameters(1, lenetGradient, buffer);
+        updateParameters(1, lenetGradient, batchBuffer);
         //Free memory
         freeLenet(&lenetGradient);
         freeFeatures(&features);
         freeFeatures(&featuresGradient);
     }
-    updateParameters(alpha, buffer, lenet);
-    freeLenet(&buffer);
+    updateParameters(alpha, batchBuffer, lenet);
+    freeLenet(&batchBuffer);
 }
 
 // ----- Prediction ----- //

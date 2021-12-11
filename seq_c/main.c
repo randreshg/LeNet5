@@ -1,5 +1,6 @@
 //gcc -o main main.c lenet5/lenet.c lenet5/backward.c lenet5/forward.c lenet5/others.c
 #include "lenet5/lenet.h"
+#define LENET_FILE "model.dat"
 
 uint testing(LeNet **lenet, uint8 testImage[][IMG_SIZE], uint8 *testLabel, uint totalSize) {
     printf("--------\n");
@@ -19,14 +20,28 @@ void training(LeNet **lenet, const uint batchSize, const uint totalSize) {
     printf("--------\n");
     printf("TRAINING\n");
     setInitialValues(lenet);
+    //Train data
     static uint8 trainImage[NUM_TRAIN][IMG_SIZE];
     static uint8 trainLabel[NUM_TRAIN];
     load_trainingData(trainImage, trainLabel);
-    for (uint i = 0, percent = 0; i < totalSize; i += batchSize) {
+    //Train data
+    uint i, aux, percent = 0;
+    for (i = 0; i < totalSize; i += batchSize) {
         trainBatch(lenet, trainImage + i, trainLabel + i, batchSize);
-        if (i * 100 / totalSize > percent)
-            printf("Train:%2d%%\n", percent = i * 100 / totalSize);
+        aux = i*100/totalSize;
+        if (aux > percent)
+            printf("Train:%2d%%\n", percent = aux);
     }
+}
+
+void load(LeNet *lenet, char filename[]) {
+    FILE *fp = fopen(filename, "rb");
+    if (!fp) {
+        printf("Model not found \n");
+        exit(0);
+    }
+    fread(lenet, sizeof(LeNet), 1, fp);
+    fclose(fp);
 }
 
 int main() {
@@ -45,9 +60,11 @@ int main() {
     if(train)
         training(lenet, 300, NUM_TRAIN);
     else
-        setInitialValues(lenet);
+        load(&lenet, LENET_FILE);
     uint rightPredictions = testing(lenet, testImage, testLabel, NUM_TEST);
     //Process ends
+    printf("-------------------\n");
+    printf("PROCESS FINISHED\n ");
     printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
     printf("Time: %u\n", (unsigned)(clock() - start));
     //Free

@@ -1,5 +1,5 @@
 #include "lenet5/lenet.h"
-#define LENET_FILE 		"model1.dat"
+#define LENET_FILE "model.dat"
 
 uint testing(LeNet *lenet, uint8 testImage[][IMG_SIZE], uint8 *testLabel, uint totalSize) {
     printf("--------\n");
@@ -24,7 +24,7 @@ void training(LeNet *lenet, const uint batchSize, const uint totalSize) {
     static uint8 trainImage[NUM_TRAIN][IMG_SIZE];
     static uint8 trainLabel[NUM_TRAIN];
     load_trainingData(trainImage, trainLabel);
-    //Training
+    //Train data
     uint i, aux, percent = 0;
     for (i = 0; i < totalSize; i += batchSize) {
         trainBatch(lenet, trainImage + i, trainLabel + i, batchSize);
@@ -34,8 +34,7 @@ void training(LeNet *lenet, const uint batchSize, const uint totalSize) {
     }
 }
 
-void load(LeNet *lenet, char filename[])
-{
+void load(LeNet *lenet, char filename[]) {
     FILE *fp = fopen(filename, "rb");
     if (!fp) {
         printf("Model not found \n");
@@ -62,7 +61,6 @@ int main() {
         training(&lenet, 300, NUM_TRAIN);
     else
         load(&lenet, LENET_FILE);
-        //setInitialValues(&lenet);
     uint rightPredictions = testing(&lenet, testImage, testLabel, NUM_TEST);
     //Process ends
     printf("-------------------\n");
