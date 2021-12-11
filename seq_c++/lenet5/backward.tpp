@@ -33,7 +33,7 @@ void convolution_backward(number (&input)[IN][IN1][IM1], number (&inputGradient)
     //Calculate output gradient
     for(wn = 0; wn < WN; wn++)
     for(wm = 0; wm < WM; wm++)
-        convolute_backward(inputGradient[wm], weightGradient[wn][wm], outputGradient[wn]);
+        convolute_backward(inputGradient[wm], weight[wn][wm], outputGradient[wn]);
     //Activation function
     activation_backward(input, outputGradient);
     //Update bias
