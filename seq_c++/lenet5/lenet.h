@@ -65,8 +65,6 @@ extern void forwardPropagation(LeNet *lenet, Features *features);
 extern void backwardPropagation(LeNet *lenet, Features *features, LeNet *lenetGradient, Features *featuresGradient);
 //Initial values
 extern void setInitialValues(LeNet *lenet);
-extern void initialValues(LeNet *lenet, const number value);
-extern void randInitialValues(LeNet *lenet);
 
 /* ----- FORWARD ----- */
 template<size_t ON, size_t ON1, size_t OM1, size_t BN>
