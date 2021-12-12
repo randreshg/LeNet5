@@ -1,5 +1,5 @@
 #include "lenet5/lenet.h"
-#define LENET_FILE "model.dat"
+#define LENET_FILE "modelf.dat"
 
 uint testing(LeNet *lenet, uint8 testImage[][IMG_SIZE], uint8 *testLabel, uint totalSize) {
     printf("--------\n");
@@ -44,6 +44,16 @@ void load(LeNet *lenet, char filename[]) {
     fclose(fp);
 }
 
+void save(LeNet *lenet, char filename[]) {
+    FILE *fp = fopen(filename, "wb");
+    if (!fp) {
+        printf("Model not found \n");
+        exit(0);
+    }
+    fwrite(lenet, sizeof(LeNet), 1, fp);
+	fclose(fp);
+}
+
 int main() {
     //Malloc 
     LeNet lenet;
@@ -63,6 +73,7 @@ int main() {
         load(&lenet, (char *)LENET_FILE);
     uint rightPredictions = testing(&lenet, testImage, testLabel, NUM_TEST);
     //Process ends
+    save(&lenet, (char *)LENET_FILE);
     printf("-------------------\n");
     printf("PROCESS FINISHED\n ");
     printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
