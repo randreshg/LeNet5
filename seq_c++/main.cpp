@@ -60,7 +60,7 @@ int main() {
     if(train)
         training(&lenet, 300, NUM_TRAIN);
     else
-        load(&lenet, LENET_FILE);
+        load(&lenet, (char *)LENET_FILE);
     uint rightPredictions = testing(&lenet, testImage, testLabel, NUM_TEST);
     //Process ends
     printf("-------------------\n");

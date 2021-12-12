@@ -16,7 +16,7 @@ void convolute_forward(number (&input)[IN][IM], number (&weight)[WN][WM], number
     //Output loop
     for(on = 0; on < ON; on++)
     for(om = 0; om < OM; om++)
-        //Weight matrix loop - KERNEL
+        //Weight matrix window * KERNEL
         for(wn = 0; wn < WN; wn++)
         for(wm = 0; wm < WM; wm++)
             //Cross-Correlation
