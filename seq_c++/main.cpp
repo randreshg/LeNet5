@@ -9,9 +9,9 @@ uint testing(LeNet *lenet, uint8 testImage[][IMG_SIZE], uint8 *testLabel, uint t
     for (i = 0; i < totalSize; i++) {
         prediction = predict(lenet, testImage[i]);
         rightPredictions += (testLabel[i] == prediction);
-        aux = i*100/totalSize;
-        if (aux > percent)
-            printf("test:%2d%%\n", percent = aux);
+        // aux = i*100/totalSize;
+        // if (aux > percent)
+        //     printf("test:%2d%%\n", percent = aux);
     }
     return rightPredictions;
 }
@@ -60,7 +60,7 @@ int main() {
     printf("-------------------\n");
     printf("PROCESS STARTED\n ");
     //Training
-    bool train = true;
+    bool train = false;
     //Testing
     static uint8 testImage[NUM_TEST][IMG_SIZE]; 
     static uint8 testLabel[NUM_TEST];
@@ -73,11 +73,11 @@ int main() {
         load(&lenet, (char *)LENET_FILE);
     uint rightPredictions = testing(&lenet, testImage, testLabel, NUM_TEST);
     //Process ends
-    save(&lenet, (char *)LENET_FILE);
+    //save(&lenet, (char *)LENET_FILE);
     printf("-------------------\n");
     printf("PROCESS FINISHED\n ");
     printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
-    printf("Time: %u seconds\n", (unsigned)(clock() - start));
+    printf("Elapsed time (s): %f \n", (double)(clock() - start)/CLOCKS_PER_SEC);
     return 0;
 }
 
