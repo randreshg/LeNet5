@@ -2,6 +2,10 @@
 #include "global/global.h"
 #include "mnist/mnist.h"
 /* ----- CONSTANTS ----- */
+#ifndef OPENMP
+#define OPENMP 0
+#endif
+//Constants
 #define LEARNING_RATE   0.5
 #define LENGTH_KERNEL   5
 //Features
