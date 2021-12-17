@@ -11,13 +11,13 @@
 #define U_THREADS 1024
 #define U_BLOCKS (int)ceil(((number)GETCOUNT(LeNet))/U_THREADS)
 //Forward parallel
-#define F_THREADS 1000
+#define F_THREADS 100
 #define F_BLOCKS 1
-#define F_PARALLEL F_THREADS * F_BLOCKS
+#define F_PARALLEL (F_THREADS * F_BLOCKS)
 //Backward parallel
-#define B_THREADS 300
+#define B_THREADS 100
 #define B_BLOCKS 1
-#define B_PARALLEL B_THREADS * B_BLOCKS
+#define B_PARALLEL (B_THREADS * B_BLOCKS)
 //LENET
 #define LEARNING_RATE   0.5
 #define LENGTH_KERNEL   5
@@ -71,7 +71,7 @@ typedef struct {
 __global__ void updateLenet(const uint max, const number factor, LeNet *inputLenet, LeNet *outputLenet);
 __host__ void trainBatch(LeNet *lenet, uint8 *input, uint8 *labels);
 //Prediction
-__host__ uint predict(LeNet *lenet, uint8 *input, uint8 *labels);
+uint predict(LeNet *lenet, uint8 *input, uint8 *labels);
 __global__ void getResult(Features *features, uint8 *labels, uint *results);
 //Propagation
 __global__ void forwardPropagation(LeNet *lenet, Features *features);

@@ -9,9 +9,10 @@ __host__ uint testing(LeNet *lenet, uint8 testImage[][IMG_SIZE], uint8 *testLabe
     const uint INPUT_SIZE = F_PARALLEL*IMG_SIZE*sizeof(uint8);
     const uint LABEL_SIZE = F_PARALLEL*sizeof(uint8);
     uint i, rightPredictions = 0;
-    uint8 *d_input, *d_label;
     //Loop
+    #pragma omp parallel for
     for (i = 0; i < totalSize; i+= F_PARALLEL) {
+        uint8 *d_input, *d_label;
         //Copy input to device
         cudaMalloc((void **)&d_input, INPUT_SIZE);
         cudaMemcpy(d_input, testImage[i], INPUT_SIZE, cudaMemcpyHostToDevice);
@@ -19,6 +20,7 @@ __host__ uint testing(LeNet *lenet, uint8 testImage[][IMG_SIZE], uint8 *testLabe
         cudaMalloc((void **)&d_label, LABEL_SIZE);
         cudaMemcpy(d_label, &testLabel[i], LABEL_SIZE, cudaMemcpyHostToDevice);
         //Predict
+        #pragma omp critical
         rightPredictions += predict(lenet, d_input, d_label);
         //Free
         cudaFree(d_input);
@@ -75,7 +77,7 @@ int main() {
     cudaMalloc((void **)&d_lenet, sizeof(LeNet));
     //Training
     bool train = true;
-    //Testing
+    //Testing data
     static uint8 testImage[NUM_TEST][IMG_SIZE]; 
     static uint8 testLabel[NUM_TEST];
     load_testData(testImage, testLabel);
@@ -86,14 +88,18 @@ int main() {
         static uint8 trainImage[NUM_TRAIN][IMG_SIZE];
         static uint8 trainLabel[NUM_TRAIN];
         load_trainingData(trainImage, trainLabel);
-        //Initial values
-        //setInitialValues(lenet);
-        load(h_lenet, d_lenet, (char *)LENET_FILE);
+        //Initial
+        load(h_lenet, d_lenet, (char *)LENET_FILE); //setInitialValues(lenet);
+        cudaEventRecord(start);
         training(d_lenet, trainImage, trainLabel, NUM_TRAIN);
     }
-    else
+    else {
+        //Testing
         load(h_lenet, d_lenet, (char *)LENET_FILE);
+        cudaEventRecord(start);
+    }
     cudaEventRecord(stop_training);
+    //Testing
     uint rightPredictions = testing(d_lenet, testImage, testLabel, NUM_TEST);
     cudaEventRecord(stop);
     //Process ends

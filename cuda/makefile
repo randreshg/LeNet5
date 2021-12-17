@@ -4,10 +4,10 @@ OBJDIR    =   objdir
 OBJ = $(addprefix $(OBJDIR)/, $(patsubst %.cu, %.o, $(wildcard *.cu)))
 
 lenet: main.o lenet.o others.o mnist.o
-	nvcc -arch=sm_35 -rdc=true -o lenet $(OUT_DIR)/main.o $(OUT_DIR)/lenet.o $(OUT_DIR)/others.o $(OUT_DIR)/mnist.o -lm  
+	nvcc -arch=sm_35 -rdc=true -Xcompiler -fopenmp -lgomp -o lenet $(OUT_DIR)/main.o $(OUT_DIR)/lenet.o $(OUT_DIR)/others.o $(OUT_DIR)/mnist.o -lm  
 
 main.o: main.cu
-	nvcc -arch=sm_35 -rdc=true -c main.cu -o $(OUT_DIR)/$@
+	nvcc -arch=sm_35 -rdc=true -Xcompiler -fopenmp -lgomp -c main.cu -o $(OUT_DIR)/$@
 
 lenet.o: lenet5/lenet.cu
 	nvcc -arch=sm_35 -rdc=true -c lenet5/lenet.cu -o $(OUT_DIR)/$@
