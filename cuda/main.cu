@@ -66,9 +66,9 @@ int main() {
     printf("-------------------\n");
     printf("PROCESS STARTED\n");
     //Events
-    cudaEvent_t start, stop;
+    cudaEvent_t start, stop_training, stop;
     cudaEventCreate(&start);
-    cudaEventCreate(&stop);
+    cudaEventCreate(&stop_training); cudaEventCreate(&stop);
     //Allocate memory
     LeNet *h_lenet, *d_lenet;
     cudaMallocHost((void **)&h_lenet, sizeof(LeNet));
@@ -93,19 +93,24 @@ int main() {
     }
     else
         load(h_lenet, d_lenet, (char *)LENET_FILE);
+    cudaEventRecord(stop_training);
     uint rightPredictions = testing(d_lenet, testImage, testLabel, NUM_TEST);
     cudaEventRecord(stop);
     //Process ends
+    cudaEventSynchronize(stop_training);
+    cudaEventSynchronize(stop);
+    float exec_time = 0, t_time = 0;
+    cudaEventElapsedTime(&t_time, start, stop_training);
+    cudaEventElapsedTime(&exec_time, start, stop);
     printf("-------------------\n");
     printf("PROCESS FINISHED\n ");
     printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
-    cudaEventSynchronize(stop);
-    float milliseconds = 0;
-    cudaEventElapsedTime(&milliseconds, start, stop);
-    printf("Elapsed time (ms): %f\n", milliseconds);
+    printf("Training time (s): %f \n", t_time/1000);
+    printf("Execution time (s): %f \n", exec_time/1000);
     //Memory free
-    cudaFree(h_lenet);
-    cudaFree(d_lenet);
+    printf("-------------------\n");
+    printf("FREE LENET MEMORY\n");
+    cudaFree(h_lenet); cudaFree(d_lenet);
     cudaDeviceReset();
     return 0;
 }

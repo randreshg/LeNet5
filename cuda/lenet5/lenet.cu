@@ -13,58 +13,27 @@ __host__ void trainBatch(LeNet *lenet, uint8 *input, uint8 *labels) {
     const number alpha = LEARNING_RATE / B_PARALLEL;
     //Lenet
     const uint LENET_SIZE = B_PARALLEL * sizeof(LeNet);
-    LeNet *h_lenet, *lenetGradients;
-    //cudaMallocHost((void **)&h_lenet, sizeof(LeNet));
+    LeNet *lenetGradients;
     cudaMalloc((void **)&lenetGradients, LENET_SIZE); cudaMemset(lenetGradients, 0, LENET_SIZE);
     //Features variables
     const uint FEATURES_SIZE = B_PARALLEL * sizeof(Features);
-    Features *h_features, *features, *featuresGradient, *h_featuresGradient;
-    //cudaMallocHost((void **)&h_features, FEATURES_SIZE);
-    //cudaMallocHost((void **)&h_featuresGradient, FEATURES_SIZE);
+    Features *features, *featuresGradients;
     cudaMalloc((void **)&features, FEATURES_SIZE); cudaMemset(features, 0, FEATURES_SIZE);
-    cudaMalloc((void **)&featuresGradient, FEATURES_SIZE); cudaMemset(featuresGradient, 0, FEATURES_SIZE);
+    cudaMalloc((void **)&featuresGradients, FEATURES_SIZE); cudaMemset(featuresGradients, 0, FEATURES_SIZE);
     //Lenet
-    LeNet *h_batchBuffer, *batchBuffer;
-    //cudaMallocHost((void **)&h_batchBuffer, sizeof(LeNet)); 
+    LeNet *batchBuffer;
     cudaMalloc((void **)&batchBuffer, sizeof(LeNet)); cudaMemset(batchBuffer, 0, sizeof(LeNet));
     //Train
     loadInput<<<B_PARALLEL, dim3(IMG_ROWS, IMG_COLS)>>>(input, features);
     forwardPropagation<<<B_BLOCKS, B_THREADS>>>(lenet, features);
-    softMax<<<B_PARALLEL, OUTPUT>>>(features, labels, featuresGradient);
-    backwardPropagation<<<B_BLOCKS, B_THREADS>>>(lenet, features, featuresGradient, lenetGradients, batchBuffer);
+    softMax<<<B_PARALLEL, OUTPUT>>>(features, labels, featuresGradients);
+    backwardPropagation<<<B_BLOCKS, B_THREADS>>>(lenet, features, featuresGradients, lenetGradients, batchBuffer);
     //Accumulate buffer
     updateLenet<<<U_BLOCKS, U_THREADS>>> (GETCOUNT(LeNet), alpha, batchBuffer, lenet);
-
     cudaDeviceSynchronize();
-    //Copy results from device
-    // cudaMemcpy(h_features, features, FEATURES_SIZE, cudaMemcpyDeviceToHost);
-    // cudaMemcpy(h_featuresGradient, featuresGradient, FEATURES_SIZE, cudaMemcpyDeviceToHost);
-    // cudaMemcpy(h_batchBuffer, batchBuffer, sizeof(LeNet), cudaMemcpyDeviceToHost);
-    // cudaMemcpy(h_lenet, lenet, sizeof(LeNet), cudaMemcpyDeviceToHost);
-    
-    // printf("\n------------\n");
-    // number *pos = (number *) h_lenet->weight0_1;
-    // for (uint m = 0; m < INPUT*LAYER1*LENGTH_KERNEL*LENGTH_KERNEL; m++) {
-    //     if(*pos != 0)
-    //     printf("%1.5f, ", *pos);
-    //     *pos++;
-    // }
-    // printf("\n------------\n" );
-    //updateLenet(1, &lenetGradient, &batchBuffer);
-
-    // for (uint i = 0; i < batchSize; i++) {
-    //     //Malloc memory
-    //     lenetGradient = {0};
-    //     features = {0}, featuresGradient = {0};
-    //
-    // }
-    // updateLenet(alpha, &batchBuffer, lenet);
     //Free
-    cudaFree(features); cudaFree(featuresGradient);
-    //cudaFree(h_features); cudaFree(h_featuresGradient);
-    //cudaFree(h_batchBuffer); 
-    cudaFree(batchBuffer);
-    cudaFree(lenetGradients);
+    cudaFree(features); cudaFree(featuresGradients);
+    cudaFree(batchBuffer); cudaFree(lenetGradients);
 }
 
 // ----- Prediction ----- //
