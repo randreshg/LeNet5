@@ -15,13 +15,9 @@ uint testing(LeNet *lenet, uint8 testImage[][IMG_SIZE], uint8 *testLabel, uint t
     return rightPredictions;
 }
 
-void training(LeNet *lenet, const uint batchSize, const uint totalSize) {
+void training(LeNet *lenet, uint8 trainImage[][IMG_SIZE], uint8 *trainLabel, const uint batchSize, const uint totalSize) {
     printf("--------\n");
     printf("TRAINING\n");
-    //Train data
-    static uint8 trainImage[NUM_TRAIN][IMG_SIZE];
-    static uint8 trainLabel[NUM_TRAIN];
-    load_trainingData(trainImage, trainLabel);
     //Train loop
     uint i, aux, percent = 0;
     for (i = 0; i < totalSize; i += batchSize) {
@@ -59,20 +55,28 @@ int main() {
     printf("PROCESS STARTED\n ");
     //Training
     bool train = true;
-    //Testing
+    //Testing data
     static uint8 testImage[NUM_TEST][IMG_SIZE]; 
     static uint8 testLabel[NUM_TEST];
     load_testData(testImage, testLabel);
     //Process starts
     double itime, t_time, ftime, exec_time;
-    itime = omp_get_wtime();
     if(train) {
-        //setInitialValues(lenet);
-        load(&lenet, (char *)LENET_FILE);
-        training(&lenet, 300, NUM_TRAIN);
+        //Training data
+        static uint8 trainImage[NUM_TRAIN][IMG_SIZE];
+        static uint8 trainLabel[NUM_TRAIN];
+        load_trainingData(trainImage, trainLabel);
+        //Initial values
+        load(&lenet, (char *)LENET_FILE); //setInitialValues(lenet);
+        //Training
+        itime = omp_get_wtime();
+        training(&lenet, trainImage, trainLabel, 300, NUM_TRAIN);
     }
-    else
+    else {
+        //Testing
         load(&lenet, (char *)LENET_FILE);
+        itime = omp_get_wtime();
+    }
     t_time = omp_get_wtime() - itime;
     uint rightPredictions = testing(&lenet, testImage, testLabel, NUM_TEST);
     //Process ends
