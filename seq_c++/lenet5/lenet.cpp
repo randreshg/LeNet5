@@ -10,17 +10,18 @@ void updateLenet(const number factor, LeNet *inputLenet, LeNet *outputLenet) {
 void trainBatch(LeNet *lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uint batchSize) {
     //Aux variables
     const number alpha = LEARNING_RATE / batchSize;
-    LeNet lenetGradient, batchBuffer = {0};
-    Features features, featuresGradient;
+    LeNet batchBuffer = {0};
+    #pragma omp parallel for if(OPENMP)
     for (uint i = 0; i < batchSize; i++) {
         //Malloc memory
-        lenetGradient = {0};
-        features = {0}, featuresGradient = {0};
+        LeNet lenetGradient = {0};
+        Features features = {0}, featuresGradient = {0};
         //Main process
         loadInput(input[i], features.input);
         forwardPropagation(lenet, &features);
         softMax(features.output, labels[i], featuresGradient.output);
         backwardPropagation(lenet, &features, &lenetGradient, &featuresGradient);
+        #pragma omp critical
         updateLenet(1, &lenetGradient, &batchBuffer);
     }
     updateLenet(alpha, &batchBuffer, lenet);

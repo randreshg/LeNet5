@@ -1,17 +1,16 @@
 #include "lenet5/lenet.h"
+#include <omp.h>
 #define LENET_FILE "modelfnt.dat"
 
 uint testing(LeNet *lenet, uint8 testImage[][IMG_SIZE], uint8 *testLabel, uint totalSize) {
     printf("--------\n");
     printf("TESTING\n");
-    uint i, rightPredictions = 0, percent = 0, aux;
-    uint8 prediction;
+    uint i, rightPredictions = 0;
+    #pragma omp parallel for if(OPENMP)
     for (i = 0; i < totalSize; i++) {
-        prediction = predict(lenet, testImage[i]);
+        uint8 prediction = predict(lenet, testImage[i]);
+        #pragma omp critical
         rightPredictions += (testLabel[i] == prediction);
-        // aux = i*100/totalSize;
-        // if (aux > percent)
-        //     printf("test:%2d%%\n", percent = aux);
     }
     return rightPredictions;
 }
@@ -27,9 +26,9 @@ void training(LeNet *lenet, const uint batchSize, const uint totalSize) {
     uint i, aux, percent = 0;
     for (i = 0; i < totalSize; i += batchSize) {
         trainBatch(lenet, trainImage + i, trainLabel + i, batchSize);
-        // aux = i*100/totalSize;
-        // if (aux > percent)
-        //     printf("Train:%2d%%\n", percent = aux);
+        aux = i*100/totalSize;
+        if (aux > percent)
+            printf("Train:%2d%%\n", percent = aux);
     }
 }
 
@@ -65,7 +64,8 @@ int main() {
     static uint8 testLabel[NUM_TEST];
     load_testData(testImage, testLabel);
     //Process starts
-    clock_t start = clock();
+    double itime, t_time, ftime, exec_time;
+    itime = omp_get_wtime();
     if(train) {
         //setInitialValues(lenet);
         load(&lenet, (char *)LENET_FILE);
@@ -73,13 +73,17 @@ int main() {
     }
     else
         load(&lenet, (char *)LENET_FILE);
+    t_time = omp_get_wtime() - itime;
     uint rightPredictions = testing(&lenet, testImage, testLabel, NUM_TEST);
     //Process ends
+    ftime = omp_get_wtime();
+    exec_time = ftime - itime;
     //save(&lenet, (char *)LENET_FILE);
     printf("-------------------\n");
     printf("PROCESS FINISHED\n ");
     printf("Results: %d/%d\n", rightPredictions, NUM_TEST);
-    printf("Elapsed time (s): %f \n", (double)(clock() - start)/CLOCKS_PER_SEC);
+    printf("Training time (s): %f \n", t_time);
+    printf("Execution time (s): %f \n", exec_time);
     return 0;
 }
 
