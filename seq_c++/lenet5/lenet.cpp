@@ -57,7 +57,7 @@ void forwardPropagation(LeNet *lenet, Features *features) {
 
 void backwardPropagation(LeNet *lenet, Features *features, LeNet *lenetGradient, Features *featuresGradient) {
     dotproduct_backward (features->layer5, featuresGradient->output, lenet->weight5_6, lenetGradient->weight5_6, lenetGradient->bias5_6, featuresGradient->layer5);
-    convolution_backward(features->layer4, featuresGradient->layer5, lenet->weight4_5, lenetGradient->weight4_5, lenetGradient->bias4_5, featuresGradient->layer4);
+    convolution_backward(features->layer4, featuresGradient->layer5, lenet->weight4_5, lenetGradient->weight4_5, lenetGradient->bias4_5, featuresGradient->layer4);    
     subsampling_backward(features->layer3, featuresGradient->layer4, featuresGradient->layer3);
     convolution_backward(features->layer2, featuresGradient->layer3, lenet->weight2_3, lenetGradient->weight2_3, lenetGradient->bias2_3, featuresGradient->layer2);
     subsampling_backward(features->layer1, featuresGradient->layer2, featuresGradient->layer1);

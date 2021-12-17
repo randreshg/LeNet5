@@ -1,5 +1,5 @@
 #include "lenet5/lenet.h"
-#define LENET_FILE "modelf.dat"
+#define LENET_FILE "modelfnt.dat"
 
 uint testing(LeNet *lenet, uint8 testImage[][IMG_SIZE], uint8 *testLabel, uint totalSize) {
     printf("--------\n");
@@ -19,18 +19,17 @@ uint testing(LeNet *lenet, uint8 testImage[][IMG_SIZE], uint8 *testLabel, uint t
 void training(LeNet *lenet, const uint batchSize, const uint totalSize) {
     printf("--------\n");
     printf("TRAINING\n");
-    setInitialValues(lenet);
     //Train data
     static uint8 trainImage[NUM_TRAIN][IMG_SIZE];
     static uint8 trainLabel[NUM_TRAIN];
     load_trainingData(trainImage, trainLabel);
-    //Train data
+    //Train loop
     uint i, aux, percent = 0;
     for (i = 0; i < totalSize; i += batchSize) {
         trainBatch(lenet, trainImage + i, trainLabel + i, batchSize);
-        aux = i*100/totalSize;
-        if (aux > percent)
-            printf("Train:%2d%%\n", percent = aux);
+        // aux = i*100/totalSize;
+        // if (aux > percent)
+        //     printf("Train:%2d%%\n", percent = aux);
     }
 }
 
@@ -60,15 +59,18 @@ int main() {
     printf("-------------------\n");
     printf("PROCESS STARTED\n ");
     //Training
-    bool train = false;
+    bool train = true;
     //Testing
     static uint8 testImage[NUM_TEST][IMG_SIZE]; 
     static uint8 testLabel[NUM_TEST];
     load_testData(testImage, testLabel);
     //Process starts
     clock_t start = clock();
-    if(train)
+    if(train) {
+        //setInitialValues(lenet);
+        load(&lenet, (char *)LENET_FILE);
         training(&lenet, 300, NUM_TRAIN);
+    }
     else
         load(&lenet, (char *)LENET_FILE);
     uint rightPredictions = testing(&lenet, testImage, testLabel, NUM_TEST);

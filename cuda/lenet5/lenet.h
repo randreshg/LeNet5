@@ -7,9 +7,17 @@
 #include <cuda_runtime.h>
 #include "mnist/mnist.h"
 /* ----- CONSTANTS ----- */
-#define BATCH_THREADS 1000
-#define BATCH_BLOCKS 1
-#define BATCH_PARALLEL BATCH_THREADS * BATCH_BLOCKS
+//Update parallel
+#define U_THREADS 1024
+#define U_BLOCKS (int)ceil(((number)GETCOUNT(LeNet))/U_THREADS)
+//Forward parallel
+#define F_THREADS 1000
+#define F_BLOCKS 1
+#define F_PARALLEL F_THREADS * F_BLOCKS
+//Backward parallel
+#define B_THREADS 300
+#define B_BLOCKS 1
+#define B_PARALLEL B_THREADS * B_BLOCKS
 //LENET
 #define LEARNING_RATE   0.5
 #define LENGTH_KERNEL   5
@@ -60,14 +68,14 @@ typedef struct {
 
 /* ----- FUNCTIONS ----- */
 //Training
-extern void updateLenet(const number factor, LeNet *inputLenet, LeNet *outputLenet);
-extern void trainBatch(LeNet *lenet, uint8 input[][IMG_SIZE], uint8 *labels, const uint batchSize);
+__global__ void updateLenet(const uint max, const number factor, LeNet *inputLenet, LeNet *outputLenet);
+__host__ void trainBatch(LeNet *lenet, uint8 *input, uint8 *labels);
 //Prediction
 __host__ uint predict(LeNet *lenet, uint8 *input, uint8 *labels);
 __global__ void getResult(Features *features, uint8 *labels, uint *results);
 //Propagation
 __global__ void forwardPropagation(LeNet *lenet, Features *features);
-__host__ void backwardPropagation(LeNet *lenet, Features *features, LeNet *lenetGradient, Features *featuresGradient);
+__global__ void backwardPropagation(LeNet *lenet, Features *features, Features *featuresGradients, LeNet *lenetGradients, LeNet *batchBuffer);
 //Initial values
 __host__ void setInitialValues(LeNet *lenet);
 
@@ -103,10 +111,10 @@ __global__ void dotproduct_backward(number (&input)[IN][IN1][IM1], number (&inpu
 
 /* ----- OTHERS ----- */
 #define GETLENGTH(array) (sizeof(array)/sizeof(*(array)))
-#define GETCOUNT(array)  (sizeof(array)/sizeof(double))
-#define f32Rand(a) (((float)rand()/(float)(RAND_MAX))*(2*a) - a)
+#define GETCOUNT(array)  (sizeof(array)/sizeof(number))
+#define f32Rand(a) (((number)rand()/(number)(RAND_MAX))*(2*a) - a)
 __global__ void loadInput(uint8 *input, Features *output);
-__global__ void softMax(number input[OUTPUT], uint8 target, number outputGradient[OUTPUT]);
+__global__ void softMax(Features *inputF, uint8 *target, Features *output);
 
 /* ----- TEMPLATE ----- */
 #include "backward.tpp"

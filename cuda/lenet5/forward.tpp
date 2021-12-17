@@ -3,9 +3,7 @@
 /* ----- FORWARD FUNCTIONS ----- */
 template<size_t ON, size_t ON1, size_t OM1, size_t BN>
 __global__ void activation_forward(number (&output)[ON][ON1][OM1], number (&bias)[BN]) {
-    uint bn = blockIdx.x,  bm = blockIdx.y;
-    uint tn = threadIdx.x, tm = threadIdx.y;
-    //uint tid = tn*blockDim.x + tm;
+    uint bn = blockIdx.x, tn = threadIdx.x;
     //ReLu
     number value = ((number *)output[bn])[tn] + bias[bn];
     ((number *)output[bn])[tn] = value*(value > 0);
@@ -21,11 +19,11 @@ __global__ void convolution_forward(number (&input)[IN][IN1][IM1], number (&weig
     __shared__ number s_weight[WN1][WM1];
     //Load shared mem from global mem
     s_input[tn][tm] = input[bn][tn][tm];
-    if(tn<WN1 && tm<WM1)
+    if(tn < WN1 && tm < WM1)
         s_weight[tn][tm] = weight[bn][bm][tn][tm];
     __syncthreads();
-    //Thread id inside output matrix
-    if(tn<ON1 && tm<OM1) {
+    //Thread inside output matrix
+    if(tn < ON1 && tm < OM1) {
         //Aux variables
         uint wn, wm;
         number result = 0;
@@ -40,16 +38,14 @@ __global__ void convolution_forward(number (&input)[IN][IN1][IM1], number (&weig
 
 template<size_t IN, size_t IN1, size_t IM1, size_t ON, size_t ON1, size_t OM1>
 __global__ void subsampling_forward(number (&input)[IN][IN1][IM1], number (&output)[ON][ON1][OM1]) {
-    uint bn = blockIdx.x,  bm = blockIdx.y;
-    uint tn = threadIdx.x, tm = threadIdx.y;
-    //uint tid = tn*blockDim.x + tm;
+    uint bn = blockIdx.x, tn = threadIdx.x, tm = threadIdx.y;
     //Shared memory
     __shared__ number s_input[IN1][IM1];
     //Load shared mem from global mem
     s_input[tn][tm] = input[bn][tn][tm];
     __syncthreads();
     //Thread id inside output matrix
-    if(tn<ON1 && tm<OM1) {
+    if(tn < ON1 && tm < OM1) {
         //Aux variables
         const uint lnLength = IN1/ON1, lmLength = IM1/OM1;
         uint ln, lm, aux_n, aux_m;
@@ -67,9 +63,7 @@ __global__ void subsampling_forward(number (&input)[IN][IN1][IM1], number (&outp
 
 template<size_t IN, size_t IN1, size_t IM1, size_t WN, size_t WM, size_t BN, size_t ON>
 __global__ void dotproduct_forward(number (&input)[IN][IN1][IM1], number (&weight)[WN][WM], number (&bias)[BN], number (&output)[ON]) {
-    uint bn = blockIdx.x,  bm = blockIdx.y;
     uint tn = threadIdx.x, tm = threadIdx.y, tn1 = tn + blockDim.x;
-    //uint tid = tn*blockDim.x + tm;
     //Shared memory
     __shared__ number s_input[WN];
     //Load shared mem from global mem
